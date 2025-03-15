@@ -1,0 +1,11 @@
+recipe: default.v1
+language: en
+pipeline:
+- name: SingleStepLLMCommandGenerator
+  llm:
+    model_group: openai-gpt-4
+
+policies:
+- name: FlowPolicy
+- name: IntentlessPolicy
+assistant_id: 20250315-162217-warped-verbiage

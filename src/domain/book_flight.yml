@@ -1,0 +1,19 @@
+version: "3.1"
+
+slots: 
+  flight_departure_city:
+    type: text
+    mappings:
+      - type: from_llm
+  flight_arrival_city:
+    type: text
+    mappings:
+      - type: from_llm
+  
+responses:
+  utter_ask_flight_departure_city:
+    - text: "What city will you be departing from?"
+  utter_ask_flight_arrival_city:
+    - text: "What city are you going to?"
+  utter_flight_booked:
+    - text: "Your flight has been booked!"

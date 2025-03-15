@@ -1,0 +1,11 @@
+flows:
+  book_flight:
+    description: This flow books a flight given a departure and arrival city
+    name: book a flight
+    steps:
+      - collect: "flight_departure_city"
+        description: "city of departure"
+      - collect: "flight_arrival_city"
+        description: "city of arrival"
+      - action: utter_flight_booked
+      

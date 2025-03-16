@@ -1,0 +1,32 @@
+version: "3.1"
+
+slots: 
+  trip_departure_city:
+    type: text
+    mappings:
+      - type: from_llm
+  budget:
+    type: text
+    mappings:
+      - type: from_llm
+  weather:
+    type: text
+    mappings:
+      - type: from_llm
+  length_of_trip:
+    type: text
+    mappings:
+      - type: from_llm
+  
+responses:
+  utter_suggest_trip:
+    - text: "It sounds like you are asking for suggestions on places to go for a trip! I would love to help you with that.\nI just need some information to help suggest a good destination."
+  utter_ask_trip_departure_city:
+    - text: "What city will you be departing from?"
+  utter_ask_budget:
+    - text: "What is your budget for this trip?"
+  utter_ask_weather:
+    - text: "What sort of weather are you looking for?"
+  utter_ask_length_of_trip:
+    - text: How many days are you looking to spend on your vacation?
+ 

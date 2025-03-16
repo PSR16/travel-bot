@@ -1,0 +1,15 @@
+flows:
+  suggest_a_trip:
+    description: This flow suggests a trip 
+    name: suggest a trip 
+    steps:
+      - action: utter_suggest_trip
+      - collect: "trip_departure_city"
+        description: "city of departure"
+      - collect: "budget"
+        description: "trip budget to stay under"
+      - collect: "weather"
+        description: preferred weather for their destination
+      - collect: "length_of_trip"
+        description: number of days or weeks they want their trip to be
+

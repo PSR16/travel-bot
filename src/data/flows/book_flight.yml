@@ -7,5 +7,13 @@ flows:
         description: "city of departure"
       - collect: "flight_arrival_city"
         description: "city of arrival"
+      - collect: "flight_departure_date"
+        description: "Date of departure"
+      - collect: "flight_return_date"
+        description: "Date of return"
+      - collect: "number_of_pax"
+        ask_before_filling: true
+        description: "Number of passengers"
+      - action: utter_confirm_flight_details
       - action: utter_flight_booked
       

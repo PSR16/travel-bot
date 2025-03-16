@@ -9,11 +9,38 @@ slots:
     type: text
     mappings:
       - type: from_llm
+  flight_departure_date:
+    type: text
+    mappings:
+      - type: from_llm
+  flight_return_date:
+    type: text
+    mappings:
+      - type: from_llm
+  number_of_pax:
+    type: text
+    initial_value: 1
+    mappings:
+      - type: from_llm
+  
   
 responses:
   utter_ask_flight_departure_city:
     - text: "What city will you be departing from?"
   utter_ask_flight_arrival_city:
     - text: "What city are you going to?"
+  utter_ask_flight_departure_date:
+    - text: "What day and time are you looking to travel?"
+  utter_ask_flight_return_date:
+    - text: "Are you booking a round-trip? If so, when would you like to return?"
+  utter_ask_number_of_pax:
+    - text: "How many people are traveling?"
+  utter_flights_foud:
+    - text: "These are the flights I have found:"
+  utter_confirm_flight_details:
+    - text: "To confirm, you're booking a flight from {flight_departure_city} to {flight_arrival_city} on {flight_departure_date}.\n
+        This is a round-trip, returning on {flight_return_date}.\n 
+        Number of passengers: {number_of_pax}.\n\n
+        Would you like to proceed?"
   utter_flight_booked:
     - text: "Your flight has been booked!"

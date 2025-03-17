@@ -1,5 +1,8 @@
 version: "3.1"
 
+actions:
+  - suggest_a_trip
+
 slots: 
   trip_departure_city:
     type: text
@@ -17,16 +20,27 @@ slots:
     type: text
     mappings:
       - type: from_llm
-  
+  domestic:
+    type: text
+    mappings:
+      - type: from_llm
+
 responses:
   utter_suggest_trip:
-    - text: "It sounds like you are asking for suggestions on places to go for a trip! I would love to help you with that.\nI just need some information to help suggest a good destination."
+    - text: "It sounds like you are asking for suggestions on places to go for a trip! I would love to help you with that.\nI just need some information to help suggest a good destination.\nFor example, you can let me know your preferred flight budget, duration of trip (days) and/or your preferred date of travel."
   utter_ask_trip_departure_city:
-    - text: "What city will you be departing from?"
+    - text: "What city or airport will you be departing from?"
   utter_ask_budget:
     - text: "What is your budget for this trip?"
   utter_ask_weather:
     - text: "What sort of weather are you looking for?"
   utter_ask_length_of_trip:
     - text: How many days are you looking to spend on your vacation?
- 
+  utter_ask_domestic:
+    - text: Domestic, international or it doesn't matter?
+  utter_searching:
+    - text: Great! Let me get a few suggestions for your next trip
+  utter_suggestions:
+    - text: Here are some suggestions on places to visit based on your preferences
+  utter_no_suggestions:
+    - text: I can't find any suggested trips based on your preferences. 

@@ -6,10 +6,20 @@ flows:
       - action: utter_suggest_trip
       - collect: "trip_departure_city"
         description: "city of departure"
-      - collect: "budget"
-        description: "trip budget to stay under"
-      - collect: "weather"
-        description: preferred weather for their destination
       - collect: "length_of_trip"
-        description: number of days or weeks they want their trip to be
+        description: the length of the trip. This could be a specific number like 4 days in which case extract the number, 4. Or weekend which should equate to 3.
+      - collect: "budget"
+        description: Flight budget to stay under
+      - action: utter_searching
+      - id: suggest_a_trip
+        action: suggest_a_trip
+        next:
+          - if: "slots.return_value = 'success'"
+            then:
+              - action: utter_suggestions
+                next: END
+          - else:
+              - action: utter_no_suggestions
+                next: END
+
 

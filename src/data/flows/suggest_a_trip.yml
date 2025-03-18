@@ -16,7 +16,6 @@ flows:
         next:
           - if: "slots.return_value = 'success'"
             then:
-              - action: utter_suggestions
                 next: END
           - else:
               - action: utter_no_suggestions

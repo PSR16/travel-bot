@@ -1,0 +1,6 @@
+flows:
+  options:
+    description: This flow lists the capabilities of this bot
+    name: options
+    steps:
+      - action: utter_options

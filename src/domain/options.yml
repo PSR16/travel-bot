@@ -1,0 +1,7 @@
+version: "3.1"
+
+responses:
+  utter_options:
+    - text: "Some things I can help you with are suggesting a trip, suggesting activities to do, and find the cheapest flight.\n Which one of these would you like help with?"
+      metadata:
+        rephrase: True

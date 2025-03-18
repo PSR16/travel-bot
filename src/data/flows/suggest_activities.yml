@@ -1,0 +1,10 @@
+flows:
+  suggest_activities:
+    description: This flow suggests activities to do in a city
+    name: suggest activities
+    steps:
+      - collect: city
+        description: "City to suggest activities for"
+      - id: suggest_activities
+        action: suggest_activities
+

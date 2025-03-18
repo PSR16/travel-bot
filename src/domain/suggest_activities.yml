@@ -1,0 +1,16 @@
+version: "3.1"
+
+actions:
+  - suggest_activities
+
+slots: 
+  city:
+    type: text
+    mappings:
+      - type: from_llm
+
+responses:
+  utter_ask_city:
+    - text: "What city would you like to suggest activities for?"
+  utter_suggest_activities:
+    - text: "I have some suggestions for you!\n"

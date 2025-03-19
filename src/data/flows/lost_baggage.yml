@@ -1,0 +1,22 @@
+flows:
+  lost_baggage:
+    description: This flow helps someone when they lose their baggage or it is delayed
+    name: lost baggage
+    steps:
+      - collect: "airport"
+        description: "airport they arrived at"
+      - collect: "airline"
+        description: "airline they flew with"
+      - id: confirm
+        collect: "confirmation"
+        description: "confirmation of the details"
+        next: 
+          - if: "slots.information_accurate is not true"
+            then:
+              - action: pattern_correction
+                next: END
+          - else: get_info
+      - id: get_info
+        action: action_provide_lost_baggage_info
+      
+

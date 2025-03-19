@@ -1,0 +1,35 @@
+version: "3.1"
+
+actions:
+  - action_provide_lost_baggage_info
+
+slots:
+  airport:
+    type: text
+    mappings:
+      - type: from_llm
+  airline:
+    type: text
+    mappings:
+      - type: from_llm
+  information_accurate:
+    type: bool
+    mappings:
+      - type: from_llm
+
+responses:
+  utter_ask_airport:
+    - text: "I'm sorry to hear about your lost baggage. At which airport did you lose your baggage?"
+  utter_ask_airline:
+    - text: "Which airline were you flying with when you lost your baggage?"
+  utter_information_accurate:
+    - text: "Just to confirm, you lost your baggage at {airport} while flying with {airline}. Is that correct?"
+      buttons:
+      - title: "Yes, that's correct."
+        payload: "/SetSlots(information_accurate=true)"
+      - title: No, something is in correct.
+        payload: "/SetSlots(information_accurate=false)"
+  utter_submit:
+    - text: "Thank you for providing the details. I'll help you with information about lost baggage procedures."
+  utter_goodbye:
+    - text: "I hope your baggage is found soon. Have a good day!"

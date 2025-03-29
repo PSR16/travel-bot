@@ -1,0 +1,264 @@
+version: "3.1"
+
+actions:
+  - action_suggest_a_trip
+  - action_suggest_a_simple_trip
+  - action_suggest_detailed_trip_info
+  - action_surprise_trip
+
+slots: 
+  trip_planning_flow:
+    type: categorical
+    values:
+      - surprise
+      - customize
+
+  surprise_trip_followup:
+    type: categorical
+    values:
+      - another_one
+      - no_thanks
+      - continue
+      
+  trip_setting:
+    type: text
+    mappings:
+      - type: from_llm
+  trip_budget:
+    type: text
+    mappings:
+      - type: from_llm
+  dom_or_int:
+    type: categorical
+    values:
+      - domestic
+      - international
+    mappings:
+      - type: from_llm
+  duration:
+    type: text
+    mappings:
+      - type: from_llm
+
+  destination:
+    type: text
+    mappings:
+      - type: from_llm
+     
+  refine_trip_details:
+    type: text
+    mappings:
+      - type: from_llm
+
+  suggested_trip_text:
+    type: text
+    mappings:
+      - type: from_llm
+
+  ## Refining Details
+  departure_city:
+    type: text
+    mappings:
+      - type: from_llm
+  preferred_transportation:
+    type: text
+    mappings:
+      - type: from_llm
+  special_requirements:
+    type: text
+    mappings:
+      - type: from_llm
+  accommodation_preferences:
+    type: text
+    mappings:
+      - type: from_llm
+  trip_season:
+    type: text
+    mappings:
+      - type: from_llm
+  activity_preferences:
+    type: text
+    mappings:
+      - type: from_llm
+
+
+  ## Detailed info
+  view_more_detail:
+    type: categorical
+    values:
+      - budget
+      - activities
+      - travel
+      - accomodations
+      - none
+
+  detailed_budget:
+    type: text
+    mappings:
+      - type: from_llm
+  detailed_activities:
+    type: text
+    mappings:
+      - type: from_llm
+  detailed_accommodation:
+    type: text
+    mappings:
+      - type: from_llm
+  detailed_travel:
+    type: text
+    mappings:
+      - type: from_llm
+  
+  
+responses:
+  utter_ask_trip_planning_flow:
+    - text: "How much help would you like in planning your trip?"
+      buttons:
+      - title: Surprise me!
+        payload: /SetSlots(trip_planning_flow=surprise)
+      - title: Customize It
+        payload: /SetSlots(trip_planning_flow=customize)
+   
+  utter_ask_surprise_trip_followup:
+    - text: "What do you think about this trip?"
+      buttons:
+      - title: Generate another trip
+        payload: /SetSlots(surprise_trip_followup=another_one)
+      - title: I like it!
+        payload: /SetSlots(surprise_trip_followup=continue)
+      - title: No Thanks
+        payload: /SetSlots(surprise_trip_followup=no_thanks)
+
+  utter_ask_trip_setting:
+    - text: "What type of trip sounds best?"
+      buttons:
+        - title: The beach
+          payload: /SetSlots(trip_setting=beach)
+        - title: Nature and Hiking
+          payload: /SetSlots(trip_setting=nature)
+        - title: City
+          payload: /SetSlots(trip_setting=city)
+        - title: None of these
+          payload: /SetSlots(trip_setting=none)
+
+  utter_ask_trip_budget:
+    - text: "How much is your budget for this trip?"
+  
+  utter_ask_duration:
+    - text: "How long do you want to stay?"
+      buttons:
+        - title: 2-3 days
+          payload: /SetSlots(duration=short)
+        - title: 4-6 days
+          payload: /SetSlots(duration=medium)
+        - title: Longer than a week
+          payload: /SetSlots(duration=long)
+
+  utter_ask_dom_or_int:
+    - text: "Are you looking for a domestic or international trip?"
+      buttons:
+        - title: Domestic
+          payload: /SetSlots(dom_or_int=domestic)
+        - title: International
+          payload: /SetSlots(dom_or_int=international)
+        - title: Either
+          payload: /SetSlots(dom_or_int=either)
+ 
+  utter_ask_refine_trip_details:
+    - text: "Would you like to continue refining the details for this trip?"
+      buttons:
+        - title: Yes
+          payload: /SetSlots(refine_trip_details=yes)
+        - title: No, thanks
+          payload: /SetSlots(refine_trip_details=no)
+
+  utter_suggested_trip:
+    - text: "Here's a suggested trip for you: {suggested_trip_text}"
+  #### Refining
+  
+  utter_ask_departure_city:
+    - text: "Which city will you be departing from?"
+  
+  utter_ask_preferred_transportation:
+    - text: "How would you prefer to travel?"
+      buttons:
+        - title: Airplane
+          payload: /SetSlots(preferred_transportation=airplane)
+        - title: Train
+          payload: /SetSlots(preferred_transportation=train)
+        - title: Car
+          payload: /SetSlots(preferred_transportation=car)
+        - title: Other
+          payload: /SetSlots(preferred_transportation=other)
+  
+  utter_ask_special_requirements:
+    - text: "Do you have any special requirements for your trip? (e.g., accessibility needs, dietary restrictions, etc.)"
+  
+  utter_ask_accommodation_preferences:
+    - text: "What type of accommodation would you prefer?"
+      buttons:
+        - title: Hotel
+          payload: /SetSlots(accommodation_preferences=hotel)
+        - title: Hostel
+          payload: /SetSlots(accommodation_preferences=hostel)
+        - title: Vacation Rental
+          payload: /SetSlots(accommodation_preferences=vacation_rental)
+        - title: Resort
+          payload: /SetSlots(accommodation_preferences=resort)
+        - title: Any
+          payload: /SetSlots(accommodation_preferences=any)
+  
+  utter_ask_trip_season:
+    - text: "When are you planning to travel?"
+      buttons:
+        - title: Spring
+          payload: /SetSlots(trip_season=spring)
+        - title: Summer
+          payload: /SetSlots(trip_season=summer)
+        - title: Fall
+          payload: /SetSlots(trip_season=fall)
+        - title: Winter
+          payload: /SetSlots(trip_season=winter)
+        - title: Specific dates
+          payload: /SetSlots(trip_season=specific)
+  
+  utter_ask_activity_preferences:
+    - text: "What activities are you most interested in during your trip?"
+      buttons:
+        - title: Sightseeing
+          payload: /SetSlots(activity_preferences=sightseeing)
+        - title: Adventure
+          payload: /SetSlots(activity_preferences=adventure)
+        - title: Relaxation
+          payload: /SetSlots(activity_preferences=relaxation)
+        - title: Cultural experiences
+          payload: /SetSlots(activity_preferences=cultural)
+        - title: Food & Dining
+          payload: /SetSlots(activity_preferences=food)
+
+  utter_ask_view_more_detail:
+    - text: "Would you like to view more details about your trip?"
+      buttons:
+        - title: Budget Details
+          payload: /SetSlots(view_more_detail=budget)
+        - title: Accomodations
+          payload: /SetSlots(view_more_detail=accomodation)
+        - title: Travel
+          payload: /SetSlots(view_more_detail=accomodation)
+        - title: Activities
+          payload: /SetSlots(view_more_detail=activities)
+        - title: None
+          payload: /SetSlots(view_more_detail=none)
+
+  utter_budget_details:
+    - text: "Your budget details are as follows:\n{detailed_budget}"
+  
+  utter_activities_details:
+    - text: "Your activities details are as follows:\n{detailed_activities}"
+
+  utter_travel_details:
+    - text: "Your travel details are as follows:\n{detailed_travel}"
+  
+  utter_accomodations_details:
+    - text: "Your accomodation details are as follows:\n{detailed_accomodation}"
+  

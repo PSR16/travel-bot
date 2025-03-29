@@ -12,4 +12,4 @@ slots:
 
 responses:
   utter_travel_budget:
-    - text: "Your travel budget is {travel_budget}"
+    - text: "Your travel budget is ${travel_budget}."

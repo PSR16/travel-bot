@@ -57,3 +57,4 @@ model_groups:
         request_timeout: 7
         max_tokens: 256
         api_key: ${OPENAI_API_KEY}
+        temperature: 0.8

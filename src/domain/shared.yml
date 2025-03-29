@@ -8,3 +8,39 @@ slots:
         action: add_contact
       - type: custom
         action: remove_contact
+  departure_city:
+    type: text
+    mappings:
+      - type: from_llm
+  destination:
+    type: text
+    mappings:
+      - type: from_llm
+  departureDate:
+    type: text
+    mappings:
+      - type: from_llm
+  returnDate:
+    type: text
+    mappings:
+      - type: from_llm
+  travel_budget:
+    type: text
+    mappings:
+      - type: custom
+        action: action_get_travel_budget
+  oneWay:
+    type: bool
+    mappings:
+      - type: from_llm
+      
+responses:
+  utter_ask_departure_city:
+    - text: "Which city will you be departing from?"
+      metadata:
+        rephrase: True
+
+  utter_ask_destination:
+    - text: "Where would you like to go?"
+      metadata:
+        rephrase: True

@@ -1,0 +1,25 @@
+version: "3.1"
+
+slots: 
+  number_of_pax:
+    type: text
+    initial_value: 1
+    mappings:
+      - type: from_llm
+
+responses:
+  utter_ask_departureDate:
+    - text: "What day and time are you looking to travel?"
+  utter_ask_returnDate:
+    - text: "Are you booking a round-trip? If so, when would you like to return?"
+  utter_ask_number_of_pax:
+    - text: "How many people are traveling?"
+  utter_flights_found:
+    - text: "These are the flights I have found:"
+  utter_confirm_flight_details:
+    - text: "To confirm, you're looking to book a flight from {departure_city} to {destination} on {departureDate}.\n
+        This is a round-trip, returning on {returnDate}.\n 
+        Number of passengers: {number_of_pax}.\n\n
+        Would you like to proceed?"
+  utter_flight_booked:
+    - text: "Your flight has been booked!"

@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": {
+                "firstName": "Alba",
+                "lastName": "Tross"
+            },
+            "preferredDepartureCity": "Madrid",
+            "preferredDepartureCountry": "Spain",
+            "preferredCurrency": "USD",
+            "preferredSeat": "Window",
+            "preferredMeal": "Vegetarian"
+        }
+    ]
+}

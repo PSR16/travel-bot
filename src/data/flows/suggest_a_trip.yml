@@ -1,25 +1,169 @@
 flows:
   suggest_a_trip:
-    description: This flow suggests a trip 
-    name: suggest a trip 
+    description: Help suggest a trip
+    name: suggest a trip
     steps:
-      - action: utter_suggest_trip
-      - collect: "trip_departure_city"
-        description: "city of departure"
-      - collect: "length_of_trip"
-        description: the length of the trip. This could be a specific number like 4 days in which case extract the number, 4. Or weekend which should equate to 3.
-      - collect: "budget"
-        description: Flight budget to stay under
-      - action: utter_searching
-      - id: suggest_a_trip
-        action: suggest_a_trip
+      - action: action_get_travel_budget
+      - action: action_get_departure_location
+      - collect: departure_city
+        description: Get departure city if not already known
         next:
-          - if: "slots.return_value = 'success'"
-            then:
-              - action: utter_next_steps
-                next: END
-          - else:
-              - action: utter_no_suggestions
-                next: END
+          - if: slots.departure_city != null
+            then: confirm_budget_departure
+          - else: END
+      - id: confirm_budget_departure
+        action: utter_confirm_budget_departure
+        next: ask_destination
+      
+      # Ask for destination or if they want cheapest flights
+      - id: ask_destination
+        collect: flight_search_type
+        description: Determine if user wants specific destination or cheapest flights
+        next:
+          - if: slots.flight_search_type = "specific_destination"
+            then: get_specific_destination
+          - if: slots.flight_search_type = "cheapest_anywhere"
+            then: get_travel_dates
+          - else: get_specific_destination  # Default
+       
+        # Get specific destination if needed
+      - id: get_specific_destination
+        collect: destination
+        description: Destination location
+        next: get_travel_dates
+      
+      # Get travel dates with flexible input
+      - id: get_travel_dates
+        collect: travel_timeframe
+        description: When the user wants to travel (month, season, or specific dates)
+        next: process_travel_dates
+      
+      # Process travel dates into actual dates
+      - id: process_travel_dates
+        action: action_process_travel_dates
+        next: get_flights
+      
+      # Get flight options
+      - id: get_flights
+        action: action_get_cheapest_flights
+        next: 
+          - if: "slots.success = 'success'"
+            then: check_more_flights
+          - else: END
+      
+      # Ask if they want to see more flights
+      - id: check_more_flights
+        collect: pick_destination
+        description: Which flight option they're interested in
+        next:
+          - if: slots.pick_destination = "see_more"
+            then: show_more_flights
+          - else: END
+      
+      # Show more flights if requested
+      - id: show_more_flights
+        action: action_get_more_cheapest_flights
+        next: END
+    # description: This flow is defunct, do not use it.
+    # name: suggest a trip 
+    # steps:
+    #   - collect: trip_planning_flow
+    #     description: Trying to narrow down the type of trip planning
+    #     next:
+    #       - if: slots.trip_planning_flow = "surprise"
+    #         then: surprise_trip
+    #       - if: slots.trip_planning_flow = "customize"
+    #         then: simple_trip_planning
+    #       - else: END
+    #   - id: surprise_trip
+    #     description: This flow suggests a random trip
+    #     call: surprise_trip_flow
+    #     next: END
+    #   - id: simple_trip_planning
+    #     description: This flow suggests a simple trip
+    #     call: simple_trip_planning_flow
+    #     next: END
 
+  # surprise_trip_flow:
+  #   if: False
+  #   description: This flow suggests a random trip
+  #   name: surprise trip
+  #   steps:
+  #     - action: action_surprise_trip
+  #     - collect: surprise_trip_followup
+  #       next:
+  #         - if: slots.surprise_trip_followup = "another_one"
+  #           then: END
+  #         - if: slots.surprise_trip_followup = "no_thanks"
+  #           then: END
+  #         - if: slots.surprise_trip_followup = "continue"
+  #           then: 
+  #             - call: detailed_trip_planning_flow
+  #               next: END
+  #         - else: END
+
+  # simple_trip_planning_flow:
+  #   if: False # only triggered from other flow
+  #   description: This flow suggests a simple trip
+  #   name: simple trip planning
+  #   steps:
+  #     - collect: trip_setting
+  #       description: Trying to narrow down the type of trip or setting they want to vacation in like at a beach, or in the city
+  #     - collect: trip_budget
+  #       description: Identify the budget for their trip
+  #     - collect: dom_or_int
+  #       description: Identify if they want to travel domestically or internationally
+  #     - collect: duration
+  #       description: Identify the duration of their trip
+  #     - action: action_suggest_a_simple_trip
+  #     - action: utter_suggested_trip
+  #     - collect: refine_trip_details
+  #       description: Ask if the user wants more details (Yes → move to Detailed Flow)
+  #       next:
+  #         - if: slots.refine_trip_details = "yes"
+  #           then: detailed_trip_planning
+  #         - else: END
+  #     - id: detailed_trip_planning
+  #       call: detailed_trip_planning_flow
+
+  # detailed_trip_planning_flow:
+  #   if: False
+  #   description: This flow suggests a detailed trip
+  #   name: detailed trip planning
+  #   steps:
+  #     - collect: departure_city
+  #       description: Identify the departure city
+  #     - collect: duration
+  #       description: Identify the duration of their trip
+  #     - collect: preferred_transportation
+  #       description: Ask how they prefer to travel (flight, train, car, cruise)
+  #     - collect: trip_season
+  #       description: Identify when they plan to travel (summer, winter, specific dates)
+  #     - collect: accommodation_preferences
+  #       description: Identify lodging preference (hotel, Airbnb, resort, hostel)
+  #     - collect: activity_preferences
+  #       description: Identify preferred activities (adventure, relaxation, culture, food, shopping)
+  #     - collect: special_requirements
+  #       description: Ask about dietary, accessibility, or special needs
+  #     - action: action_suggest_detailed_trip_info
+  #     - collect: view_more_detail
+  #       description: Ask if they want to view more details
+  #       next:
+  #         - if: slots.view_more_detail = "budget"
+  #           then: 
+  #             - action: utter_budget_details
+  #               next: END
+  #         - if: slots.view_more_detail = "activities"
+  #           then: 
+  #             - action: utter_activities_details
+  #               next: END
+  #         - if: slots.view_more_detail = "travel"
+  #           then: 
+  #             - action: utter_travel_details
+  #               next: END
+  #         - if: slots.view_more_detail = "accomodations"
+  #           then: 
+  #             - action: utter_accomodations_details
+  #               next: END
+  #         - else: END
 

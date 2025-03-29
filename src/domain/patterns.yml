@@ -1,0 +1,14 @@
+version: "3.1"
+
+slots:
+  user_id:
+    type: text
+    initial_value: 1
+    mappings:
+      - type: from_llm
+
+responses:
+  utter_good_day:
+    - text: "Hello! How can I help you today?"
+      metadata:
+        rephrase: True

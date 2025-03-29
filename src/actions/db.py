@@ -1,57 +1,113 @@
 import os
-import shutil
-import tempfile
-from typing import Any, List
+import json
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
-
-from rasa.nlu.utils import write_json_to_file
 from rasa.shared.utils.io import read_json_file
+from rasa.nlu.utils import write_json_to_file
 
-ORIGIN_DB_PATH = "db"
-CONTACTS = "contacts.json"
+# Define the database path
+DATABASE_PATH = "db/database.json"
 
+class User:
+    """Class representing a user in the database."""
+    def __init__(self, user_data: Dict[str, Any]):
+        self.id = user_data.get("id")
+        name_data = user_data.get("name", {})
+        self.first_name = name_data.get("firstName")
+        self.last_name = name_data.get("lastName")
+        self.preferred_departure_city = user_data.get("preferredDepartureCity")
+        self.preferred_departure_country = user_data.get("preferredDepartureCountry")
+        self._raw_data = user_data
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert user object back to dictionary."""
+        return self._raw_data
 
-class Contact(BaseModel):
-    name: str
-    handle: str
+def read_database() -> Dict[str, Any]:
+    """Read the database file."""
+    try:
+        return read_json_file(DATABASE_PATH)
+    except Exception as e:
+        print(f"Error reading database: {e}")
+        return {"users": []}
 
+def write_database(data: Dict[str, Any]) -> None:
+    """Write data to the database file."""
+    try:
+        write_json_to_file(DATABASE_PATH, data)
+    except Exception as e:
+        print(f"Error writing to database: {e}")
 
-def get_session_db_path(session_id: str) -> str:
-    tempdir = tempfile.gettempdir()
-    project_name = "calm_starter"
-    return os.path.join(tempdir, project_name, session_id)
+def get_users() -> List[User]:
+    """Get all users from the database."""
+    db = read_database()
+    return [User(user_data) for user_data in db.get("users", [])]
 
+def get_user_by_id(user_id: int) -> Optional[User]:
+    """Get a user by their ID."""
+    users = get_users()
+    for user in users:
+        if user.id == user_id:
+            return user
+    return None
 
-def prepare_db_file(session_id: str, db: str) -> str:
-    session_db_path = get_session_db_path(session_id)
-    os.makedirs(session_db_path, exist_ok=True)
-    destination_file = os.path.join(session_db_path, db)
-    if not os.path.exists(destination_file):
-        origin_file = os.path.join(ORIGIN_DB_PATH, db)
-        shutil.copy(origin_file, destination_file)
-    return destination_file
+def get_user_by_name(first_name: str, last_name: str = None) -> Optional[User]:
+    """Get a user by their name."""
+    users = get_users()
+    for user in users:
+        if user.first_name == first_name:
+            if last_name is None or user.last_name == last_name:
+                return user
+    return None
 
+def get_preferred_departure_city(user_id: int) -> Optional[str]:
+    """Get the preferred departure city for a user."""
+    user = get_user_by_id(user_id)
+    return user.preferred_departure_city if user else None
 
-def read_db(session_id: str, db: str) -> Any:
-    db_file = prepare_db_file(session_id, db)
-    return read_json_file(db_file)
+def get_preferred_departure_country(user_id: int) -> Optional[str]:
+    """Get the preferred departure country for a user."""
+    user = get_user_by_id(user_id)
+    return user.preferred_departure_country if user else None
 
+def add_user(user_data: Dict[str, Any]) -> bool:
+    """Add a new user to the database."""
+    db = read_database()
+    users = db.get("users", [])
+    
+    # Generate a new ID if not provided
+    if "id" not in user_data:
+        max_id = 0
+        for user in users:
+            if user.get("id", 0) > max_id:
+                max_id = user.get("id")
+        user_data["id"] = max_id + 1
+    
+    users.append(user_data)
+    db["users"] = users
+    write_database(db)
+    return True
 
-def write_db(session_id: str, db: str, data: Any) -> None:
-    db_file = prepare_db_file(session_id, db)
-    write_json_to_file(db_file, data)
-
-
-def get_contacts(session_id: str) -> List[Contact]:
-    return [Contact(**item) for item in read_db(session_id, CONTACTS)]
-
-
-def add_contact(session_id: str, contact: Contact) -> None:
-    contacts = get_contacts(session_id)
-    contacts.append(contact)
-    write_db(session_id, CONTACTS, [c.dict() for c in contacts])
-
-
-def write_contacts(session_id: str, contacts: List[Contact]) -> None:
-    write_db(session_id, CONTACTS, [c.dict() for c in contacts])
+def update_user(user_id: int, updated_data: Dict[str, Any]) -> bool:
+    """Update an existing user in the database."""
+    db = read_database()
+    users = db.get("users", [])
+    
+    for i, user in enumerate(users):
+        if user.get("id") == user_id:
+            # Update only the fields provided in updated_data
+            for key, value in updated_data.items():
+                if key == "name" and isinstance(value, dict):
+                    # Handle nested name object
+                    if "name" not in user:
+                        user["name"] = {}
+                    for name_key, name_value in value.items():
+                        user["name"][name_key] = name_value
+                else:
+                    user[key] = value
+            
+            db["users"] = users
+            write_database(db)
+            return True
+    
+    return False

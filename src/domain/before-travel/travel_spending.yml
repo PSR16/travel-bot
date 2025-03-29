@@ -1,0 +1,15 @@
+version: "3.1"
+
+actions:
+  - action_get_travel_budget
+
+slots: 
+  travel_budget:
+    type: text
+    mappings: 
+      - type: custom
+        action: action_get_travel_budget
+
+responses:
+  utter_travel_budget:
+    - text: "Your travel budget is {travel_budget}"

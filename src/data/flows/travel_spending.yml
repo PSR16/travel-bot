@@ -1,0 +1,7 @@
+flows:
+  travel_budget:
+    description: This flow gets the travel budget
+    name: travel budget
+    steps:
+      - action: action_get_travel_budget
+      - action: utter_travel_budget

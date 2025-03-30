@@ -1,5 +1,14 @@
 version: "3.1"
 
+actions:
+  - action_search_flights
+  - action_confirm_flight_details
+  - action_book_flight
+  - action_reset_flight_booking
+  - validate_returnDate
+  - validate_departureDate
+
+  
 slots: 
   number_of_pax:
     type: text
@@ -7,19 +16,67 @@ slots:
     mappings:
       - type: from_llm
 
+  flight_offers:
+    type: list
+    mappings:
+      - type: custom
+  
+  travel_class:
+    type: categorical
+    values:
+      - economy
+      - premium_economy
+      - business
+      - first
+    mappings:
+      - type: from_llm
+  
+  trip_type:
+    type: categorical
+    initial_value: round-trip
+    values:
+      - one-way
+      - round-trip
+    mappings:
+      - type: from_llm
+
+  confirm_flight_details:
+    type: categorical
+    values:
+      - "yes"
+      - "no"
+    mappings:
+      - type: from_llm
+  
+  selected_flight_index:
+    type: text
+    mappings:
+      - type: from_llm
+
 responses:
   utter_ask_departureDate:
     - text: "What day and time are you looking to travel?"
   utter_ask_returnDate:
-    - text: "Are you booking a round-trip? If so, when would you like to return?"
+    - text: "Are you booking a round-trip? If so, when would you like to return? (Say 'one-way' if you don't need a return flight)"
   utter_ask_number_of_pax:
     - text: "How many people are traveling?"
+  utter_ask_travel_class:
+    - text: "What travel class would you prefer? (Economy, Premium Economy, Business, or First)"
+  utter_ask_selected_flight:
+    - text: "Which flight option would you like to book? Please select a number."
   utter_flights_found:
     - text: "These are the flights I have found:"
-  utter_confirm_flight_details:
+  utter_no_flights_found:
+    - text: "I couldn't find any flights matching your criteria. Would you like to try different dates or destinations?"
+  utter_ask_confirm_flight_details:
     - text: "To confirm, you're looking to book a flight from {departure_city} to {destination} on {departureDate}.\n
-        This is a round-trip, returning on {returnDate}.\n 
-        Number of passengers: {number_of_pax}.\n\n
-        Would you like to proceed?"
+        This is a {trip_type} flight.\n 
+        Number of passengers: {number_of_pax}.\n
+        Travel class: {travel_class}.\n\n
+        Would you like to proceed with the search?"
+  utter_ask_selected_flight_index:
+    - text: "Which flight option would you like to book? Please select a number."
   utter_flight_booked:
-    - text: "Your flight has been booked!"
+    - text: "Great! Your flight has been booked. You'll receive a confirmation email shortly with all the details."
+  utter_booking_failed:
+    - text: "I'm sorry, but there was an issue with your booking. Please try again later or contact customer support."

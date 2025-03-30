@@ -6,8 +6,9 @@
                 "firstName": "Alba",
                 "lastName": "Tross"
             },
-            "preferredDepartureCity": "Madrid",
-            "preferredDepartureCountry": "Spain",
+            "preferredDepartureCity": "Seattle",
+            "preferredDepartureState": "Washington",
+            "preferredDepartureCountry": "USA",
             "preferredCurrency": "USD",
             "preferredSeat": "Window",
             "preferredMeal": "Vegetarian"

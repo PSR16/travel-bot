@@ -11,10 +11,10 @@ class AmadeusService:
     CLIENT_ID = os.getenv("AMADEUS_CLIENT_ID")
     CLIENT_SECRET = os.getenv("AMADEUS_CLIENT_SECRET")
     AUTH_URL = "https://test.api.amadeus.com/v1/security/oauth2/token"
-    FLIGHT_DESTINATIONS_URL = "https://test.api.amadeus.com/v1/shopping/flight-destinations"
-    CHEAPEST_FLIGHT_URL = "https://test.api.amadeus.com/v1/shopping/flight-dates"
+    FLIGHT_DESTINATIONS_URL = "https://test.api.amadeus.com/v1/shopping/flight-destinations" ##Cheapest destinations to fly to
+    CHEAPEST_FLIGHT_URL = "https://test.api.amadeus.com/v1/shopping/flight-dates" ##Cheapest flights given from/to
     AIRPORT_SEARCH_URL = os.getenv("AMADEUS_AIRPORT_SEARCH_URL", "https://test.api.amadeus.com/v1/reference-data/locations")
-
+    FLIGHT_OFFERS_URL = "https://test.api.amadeus.com/v2/shopping/flight-offers"
     def __init__(self):
         self.access_token = None
     
@@ -94,4 +94,21 @@ class AmadeusService:
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Error fetching cheapest flights: {e}")
+            return None
+
+    def search_flight_offers(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Get flight offers based on parameters"""
+        if not self.access_token:
+            self.access_token = self.get_access_token()
+            if not self.access_token:
+                return None
+                
+        headers = {"Authorization": f"Bearer {self.access_token}"}
+        
+        try:
+            response = requests.get(self.FLIGHT_OFFERS_URL, params=params, headers=headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching flight offers: {e}")
             return None

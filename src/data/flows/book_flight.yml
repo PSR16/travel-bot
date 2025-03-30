@@ -3,16 +3,40 @@ flows:
     description: This flow books a flight given a departure and arrival city
     name: book a flight
     steps:
+      - action: action_get_departure_location
       - collect: "departure_city"
         description: "city of departure"
       - collect: "destination"
         description: "city of arrival"
       - collect: "departureDate"
-        description: "Date of departure"
+        description: "Date of departure in YYYY-MM-DD format of the current year, 2025"
       - collect: "returnDate"
-        description: "Date of return"
+        description: "Date of return in YYYY-MM-DD format of the current year, 2025"
       - collect: "number_of_pax"
         ask_before_filling: true
         description: "Number of passengers"
-      - action: utter_confirm_flight_details
-      
+      - collect: "travel_class"
+        description: "Travel class (Economy, Premium Economy, Business, First)"
+        ask_before_filling: true
+      #- action: action_confirm_flight_details
+      - collect: confirm_flight_details
+        description: "User confirmation to proceed with flight search"
+        ask_before_filling: true
+        next:
+          - if: slots.confirm_flight_details == "yes"
+            then: search_flights
+          - else: END
+
+      #Search flight offers
+      - id: search_flights
+        action: action_search_flights
+        next: select_flight
+
+      # Select a flight
+      - id: select_flight
+        collect: "selected_flight_index"
+        description: "Selected flight option number"
+        ask_before_filling: true
+
+      - action: action_book_flight
+      - action: action_reset_flight_booking

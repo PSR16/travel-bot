@@ -1,0 +1,53 @@
+test_cases:
+  - test_case: KqK6bl07UtA2NPxlAAAD
+    steps:
+    - user: "/session_start"
+    - utter: utter_good_day
+    - user: "i need to book a flight"
+      assertions:
+        - bot_uttered:
+            utter_name: utter_ask_destination
+        - slot_was_set:
+            - name: departure_city
+              value: "Madrid"
+    - user: "new york"
+      assertions:
+        - slot_was_set:
+            - name: destination
+              value: "New York"
+        - bot_uttered:
+            utter_name: utter_ask_departureDate
+    - user: "april 1"
+      assertions:
+        - slot_was_set:
+            - name: departure_date
+              value: "2025-04-01"
+        - bot_uttered:
+            utter_name: utter_ask_returnDate
+    - user: "the 9th"
+      assertions:
+        - slot_was_set:
+            - name: return_date
+              value: "2025-04-09"
+        - bot_uttered:
+            utter_name: utter_ask_number_of_pax
+    - user: "just me"
+      assertions:
+        - slot_was_set:
+            - name: number_of_pax
+              value: "1"
+        - bot_uttered:
+            utter_name: utter_ask_travel_class
+    - user: "the cheapest one"
+      assertions:
+        - slot_was_set:
+            - name: travel_class
+              value: "Economy"
+        - bot_uttered:
+            utter_name: utter_ask_confirm_flight_details
+    - user: "yes"
+      assertions:
+        - slot_was_set:
+            - name: confirm_flight_details
+              value: "yes"
+

@@ -34,7 +34,7 @@ slots:
     mappings:
       - type: from_llm
 
-  @selected_destination:
+  selected_destination:
     type: any
     mappings:
       - type: custom

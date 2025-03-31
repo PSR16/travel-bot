@@ -117,7 +117,7 @@ class ActionShowMoreDestinations(Action):
         current_page = tracker.get_slot("current_page") or 0
         
         if not destinations:
-            dispatcher.utter_message(text="I don't have any flight suggestions to show you. Let's search for flights first.")
+           # dispatcher.utter_message(text="I don't have any flight suggestions to show you. Let's search for flights first.")
             return []
         
         # Calculate next page
@@ -223,7 +223,7 @@ class ActionSelectDestination(Action):
         flight_suggestions = tracker.get_slot("flight_suggestions")
         
         if not flight_suggestions:
-            dispatcher.utter_message(text="I don't have any flight suggestions available. Let's search for flights first.")
+            #dispatcher.utter_message(text="I don't have any flight suggestions available. Let's search for flights first.")
             return []
         
         # Get the selected destination index

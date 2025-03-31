@@ -47,17 +47,16 @@ slots:
 
 responses:
   utter_good_day:
-    - text: "Hello! How can I help you today?"
+    - text: "Hello! I'm your travel assistant. I can help you find the best flight deals, suggest destinations within your budget, or book your next adventure. What would you like to do today?"
       metadata:
         rephrase: True
 
   utter_welcome_back_with_flights:
-    - text: "Welcome back! I see you have an upcoming flight. Would you like to check its status?"
+    - text: "Welcome back! I see you have an upcoming flight from {next_flight_departure} to {next_flight_arrival} on {next_flight_date}. Would you like to check its status, make changes, or perhaps plan another trip?"
       metadata:
         rephrase: True
   
   utter_welcome_back_no_flights:
-    - text: "Welcome back! How can I help you today? Perhaps you'd like to book a flight?"
+    - text: "Welcome back! Ready to plan your next adventure? I can help you discover affordable destinations, find the best flight deals, or book your perfect getaway. What are you looking for today?"
       metadata:
         rephrase: True
- 

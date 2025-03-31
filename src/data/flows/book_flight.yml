@@ -5,16 +5,17 @@ flows:
     steps:
       # Get departure city
       - action: action_get_departure_location
-      - collect: "departure_city"
+      - collect: departure_city
         description: "city of departure formatted appropriately"
-      - collect: "destination"
+      - collect: destination
         description: "city of arrival formatted appropriately"
 
       #collect dates
       - id: collect_dates
-        collect: "departureDate"
+        collect: departureDate
         description: "Date of departure in YYYY-MM-DD format of the current year, 2025"
-      - collect: "returnDate"
+
+      - collect: returnDate
         description: "Date of return in YYYY-MM-DD format of the current year, 2025"
         rejections: 
           - if: slots.returnDate < slots.departureDate

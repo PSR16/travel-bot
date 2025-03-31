@@ -5,8 +5,6 @@ actions:
   - action_confirm_flight_details
   - action_book_flight
   - action_reset_flight_booking
-  #- validate_returnDate
-  #- validate_departureDate
 
 slots: 
   number_of_pax:

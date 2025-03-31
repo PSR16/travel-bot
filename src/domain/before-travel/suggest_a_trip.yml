@@ -1,15 +1,15 @@
 version: "3.1"
 
 actions:
-  - action_suggest_a_trip
-  - action_suggest_a_simple_trip
-  - action_suggest_detailed_trip_info
-  - action_surprise_trip
   - action_get_departure_location
   - action_process_travel_dates
-  - action_get_cheapest_flights
-  - action_get_more_cheapest_flights
+  - action_get_destinations
+  - action_show_more_destinations
+  - action_show_previous_destinations
+  - action_ask_should_book
   - action_get_travel_budget
+  - action_ask_destination_index
+  - action_transition_to_booking
 
 slots: 
   # Flight search slots
@@ -17,10 +17,18 @@ slots:
     type: categorical
     values:
       - specific_destination
-      - cheapest_anywhere
+      - any_destination
     mappings:
       - type: from_llm
 
+  confirm_bud_dep:
+    type: categorical
+    values:
+      - yes
+      - no
+    mappings:
+      - type: from_llm
+      
   travel_timeframe:
     type: text
     mappings:
@@ -30,57 +38,177 @@ slots:
     type: text
     mappings:
       - type: from_llm
+      
   maxPrice:
     type: text
     mappings:
       - type: from_llm
 
-   # Result slots
+  # Result slots
   success:
     type: text
     mappings:
       - type: from_llm
+      
   flight_suggestions:
     type: list
     initial_value: []
     mappings:
       - type: custom
-        action: action_get_cheapest_flights
-  pick_destination:
+        action: action_get_destinations
+  
+  current_page:
+    type: float
+    initial_value: 0
+    mappings:
+      - type: custom
+        action: action_display_destinations
+      - type: custom
+        action: action_show_more_destinations
+      - type: custom
+        action: action_show_previous_destinations
+  
+  destination_index:
+    type: any
+    mappings:
+      - type: custom
+        action: action_display_destinations
+  
+  should_book:
     type: categorical
     values:
-      - 1
-      - 2
-      - 3
-      - see_more
+      - yes
+      - no
+    mappings:
+      - type: from_llm
+      
+  selected_destination:
+    type: any
+    mappings:
+      - type: custom
+        action: action_display_destinations
 
 responses:
   utter_confirm_budget_departure:
-    - text: "Great! I'll help you find a trip from {departure_city} with a budget of {travel_budget}."
+    - text: "Great! It looks like you're planning to leave from {departure_city} with a budget of {travel_budget}, is that correct?"
       metadata:
         rephrase: True
   
+  utter_ask_confirm_bud_dep:
+    - text: "Great! It looks like you're planning to leave from {departure_city} with a budget of {travel_budget}, is that correct?"
+
   utter_ask_flight_search_type:
     - text: "Are you looking for flights to a specific destination or would you like to see the cheapest flights available from {departure_city}?"
       buttons:
         - title: Specific destination
           payload: /SetSlots(flight_search_type=specific_destination)
         - title: Show cheapest flights anywhere
-          payload: /SetSlots(flight_search_type=cheapest_anywhere)
+          payload: /SetSlots(flight_search_type=any_destination)
 
   utter_ask_travel_timeframe:
     - text: "When would you like to travel? You can tell me a specific date, month, or even just 'next month' or 'summer'."
       metadata:
         rephrase: True
   
-  utter_ask_pick_destination:
-    - text: "Which flight option interests you?"
-      buttons:
-        - title: Flight 1
-          payload: /SetSlots(pick_destination=1)
-        - title: Flight 2
-          payload: /SetSlots(pick_destination=2)
-        - title: Flight 3
-          payload: /SetSlots(pick_destination=3)
-        - title: See more options
-          payload: /SetSlots(pick_destination=see_more)
+  utter_ask_duration:
+    - text: "How long would you like your trip to be?"
+      metadata:
+        rephrase: True
+
+
+# version: "3.1"
+
+# actions:
+#   - action_get_departure_location
+#   - action_process_travel_dates
+#   - action_get_destinations
+#   - action_get_more_destinations
+#   - action_get_travel_budget
+#   - action_pick_destination
+#   - action_select_destination
+
+# slots: 
+#   # Flight search slots
+#   flight_search_type:
+#     type: categorical
+#     values:
+#       - specific_destination
+#       - any_destination
+#     mappings:
+#       - type: from_llm
+
+#   travel_timeframe:
+#     type: text
+#     mappings:
+#       - type: from_llm
+
+#   duration:
+#     type: text
+#     mappings:
+#       - type: from_llm
+#   maxPrice:
+#     type: text
+#     mappings:
+#       - type: from_llm
+
+#    # Result slots
+#   success:
+#     type: text
+#     mappings:
+#       - type: from_llm
+#   flight_suggestions:
+#     type: list
+#     initial_value: []
+#     mappings:
+#       - type: custom
+#         action: action_get_destinations
+ 
+#   pick_destination:
+#     type: categorical
+#     values:
+#       - 1
+#       - 2
+#       - 3
+#       - see_more
+
+#   destination_index:
+#     type: any
+#     mappings:
+#       - type: custom
+#         action: action_pick_destination
+
+# responses:
+#   utter_confirm_budget_departure:
+#     - text: "Great! It looks like you're planning to leave from {departure_city} with a budget of {travel_budget}, is that correct?"
+#       metadata:
+#         rephrase: True
+  
+#   utter_ask_flight_search_type:
+#     - text: "Are you looking for flights to a specific destination or would you like to see the cheapest flights available from {departure_city}?"
+#       buttons:
+#         - title: Specific destination
+#           payload: /SetSlots(flight_search_type=specific_destination)
+#         - title: Show cheapest flights anywhere
+#           payload: /SetSlots(flight_search_type=any_destination)
+
+#   utter_ask_travel_timeframe:
+#     - text: "When would you like to travel? You can tell me a specific date, month, or even just 'next month' or 'summer'."
+#       metadata:
+#         rephrase: True
+  
+#   utter_ask_duration:
+#     - text: "How long would you like your trip to be?"
+#       metadata:
+#         rephrase: True
+
+#   utter_ask_pick_destination:
+#     - text: "Which destination interests you?"
+#       buttons:
+#         - title: Flight 1
+#           payload: /SetSlots(pick_destination=1)
+#         - title: Flight 2
+#           payload: /SetSlots(pick_destination=2)
+#         - title: Flight 3
+#           payload: /SetSlots(pick_destination=3)
+#         - title: See more options
+#           payload: /SetSlots(pick_destination=see_more)

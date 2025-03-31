@@ -111,3 +111,37 @@ def update_user(user_id: int, updated_data: Dict[str, Any]) -> bool:
             return True
     
     return False
+
+def add_flight_to_user(user_id: int, flight_data: Dict[str, Any]) -> bool:
+    """Add a flight booking to a user's record.
+    
+    Args:
+        user_id: The ID of the user
+        flight_data: Dictionary containing flight booking details
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    user = get_user_by_id(user_id)
+    if not user:
+        return False
+    
+    user_dict = user.to_dict()
+    
+    # Initialize flights array if it doesn't exist
+    if "flights" not in user_dict:
+        user_dict["flights"] = []
+    
+    # Generate flight ID if not provided
+    if "id" not in flight_data:
+        max_id = 0
+        for flight in user_dict["flights"]:
+            if flight.get("id", 0) > max_id:
+                max_id = flight.get("id")
+        flight_data["id"] = max_id + 1
+    
+    # Add the flight to the user's flights
+    user_dict["flights"].append(flight_data)
+    
+    # Update the user in the database
+    return update_user(user_id, user_dict)

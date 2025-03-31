@@ -5,4 +5,16 @@ flows:
     nlu_trigger:
       - intent: session_start
     steps:
-      - action: utter_good_day
+      - action: action_check_user_flights
+        next:
+          - if: slots.has_flights == True
+            then: 
+              - action: utter_welcome_back_with_flights
+                next: END
+          - if: slots.has_flights == False
+            then:
+              - action: utter_welcome_back_no_flights
+                next: END
+          - else: 
+              - action: utter_good_day
+                next: END

@@ -62,7 +62,7 @@ class FlightService:
                 return result
                 
             params["destination"] = arr_iata_code
-            response_data = self.amadeus_service.search_cheapest_flights(params)
+            response_data = self.amadeus_service.search_destinations(params)
         else:
             response_data = self.amadeus_service.search_flight_destinations(params)
     
@@ -82,7 +82,7 @@ class FlightService:
         if not flights_to_show:
             return "No more flight suggestions available."
             
-        response_message = "These are some flight suggestions for you:\n\n"
+        response_message = "These are some destination suggestions for you:\n\n"
         
         for i, flight in enumerate(flights_to_show):
             flight_text = (
@@ -91,7 +91,7 @@ class FlightService:
                 #f"🛬 To: {flight['destination']}\n"
                 f"📅 Depart: {flight['departureDate']}\n"
                 f"📅 Return: {flight['returnDate']}\n"
-                f"💰 Price: ${flight['price'].get('total', 'Unavailable')}"
+               # f"💰 Price: ${flight['price'].get('total', 'Unavailable')}"
             )
             response_message += flight_text + "\n\n"
             

@@ -5,9 +5,9 @@ slots:
     type: any
     mappings:
       - type: custom
-        action: add_contact
+        action: action_search_flights
       - type: custom
-        action: remove_contact
+        action: action_get_destinations
   departure_city:
     type: text
     mappings:
@@ -33,6 +33,12 @@ slots:
     type: bool
     mappings:
       - type: from_llm
+
+  @selected_destination:
+    type: any
+    mappings:
+      - type: custom
+        action: action_select_destination
       
 responses:
   utter_ask_departure_city:

@@ -12,7 +12,7 @@ class AmadeusService:
     CLIENT_SECRET = os.getenv("AMADEUS_CLIENT_SECRET")
     AUTH_URL = "https://test.api.amadeus.com/v1/security/oauth2/token"
     FLIGHT_DESTINATIONS_URL = "https://test.api.amadeus.com/v1/shopping/flight-destinations" ##Cheapest destinations to fly to
-    CHEAPEST_FLIGHT_URL = "https://test.api.amadeus.com/v1/shopping/flight-dates" ##Cheapest flights given from/to
+    GET_DESTINATIONS_URL = "https://test.api.amadeus.com/v1/shopping/flight-dates" ##Cheapest flights given from/to
     AIRPORT_SEARCH_URL = os.getenv("AMADEUS_AIRPORT_SEARCH_URL", "https://test.api.amadeus.com/v1/reference-data/locations")
     FLIGHT_OFFERS_URL = "https://test.api.amadeus.com/v2/shopping/flight-offers"
     def __init__(self):
@@ -71,6 +71,7 @@ class AmadeusService:
                 
         headers = {"Authorization": f"Bearer {self.access_token}"}
         
+        print(params)
         try:
             response = requests.get(self.FLIGHT_DESTINATIONS_URL, params=params, headers=headers)
             response.raise_for_status()
@@ -79,8 +80,8 @@ class AmadeusService:
             print(f"Error fetching flight destinations: {e}")
             return None
     
-    def search_cheapest_flights(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Search for cheapest flights based on parameters"""
+    def search_destinations(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Search for destinations based on parameters"""
         if not self.access_token:
             self.access_token = self.get_access_token()
             if not self.access_token:
@@ -89,7 +90,7 @@ class AmadeusService:
         headers = {"Authorization": f"Bearer {self.access_token}"}
         
         try:
-            response = requests.get(self.CHEAPEST_FLIGHT_URL, params=params, headers=headers)
+            response = requests.get(self.GET_DESTINATIONS_URL, params=params, headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

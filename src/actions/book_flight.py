@@ -4,6 +4,7 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 from datetime import datetime  
 from services.flight_service import FlightService
+from actions.db import add_flight_to_user
 
 # class ValidateReturnDate(Action):
 #     def name(self) -> Text:
@@ -110,7 +111,7 @@ class ActionSearchFlights(Action):
         price_msg = f"\n💰 {currency} {price}"
         # Create the outbound message
         outbound_msg = (
-            f"Option {index}, {price_msg}\n"
+            f"Option {index}\n"
             f"✈️ {departure_iata} → {arrival_iata}, 🛑 {stops_text}\n"
             f"📅 {formatted_date}\n"
             f"⏰ {dep_emoji} {dep_time} → {arr_emoji} {arr_time} ({duration})"
@@ -156,11 +157,11 @@ class ActionSearchFlights(Action):
                     f"\n🔄 Return: \n"
                     f"✈️ {return_departure_iata} → {return_arrival_iata}, 🛑 {ret_stops_text}\n"
                     f"📅 {ret_formatted_date}\n"
-                    f"⏰ {ret_dep_emoji} {ret_dep_time} → {ret_arr_emoji} {ret_arr_time} ({ret_duration})\n"
+                    f"⏰ {ret_dep_emoji} {ret_dep_time} → {ret_arr_emoji} {ret_arr_time} ({ret_duration})"
                 )
         
         # Combine all parts
-        full_message = f"{outbound_msg}{return_msg}"
+        full_message = f"{outbound_msg}{return_msg}{price_msg}"
         
         return full_message
     
@@ -216,14 +217,14 @@ class ActionSearchFlights(Action):
                     formatted_message = self.format_flight_offer(offer, i+1)
                     dispatcher.utter_message(text=formatted_message)
                 
-                return [SlotSet("flight_offers", flight_offers)]
+                return [SlotSet("flight_offers", flight_offers), SlotSet("return_value", "success")]
             else:
-                dispatcher.utter_message(text="I couldn't find any flights matching your criteria. Would you like to try different dates or destinations?")
-                return [SlotSet("flight_offers", None)]
+                #dispatcher.utter_message(text="I couldn't find any flights matching your criteria. Would you like to try different dates or destinations?")
+                return [SlotSet("flight_offers", None), SlotSet("return_value", "no_flights_found")]
             
         except Exception as e:
             dispatcher.utter_message(text=f"I encountered an error while searching for flights: {str(e)}")
-            return [SlotSet("flight_offer_success", False)]
+            return [SlotSet("return_value", "error")]
 
 
 class ActionConfirmFlightDetails(Action):
@@ -264,20 +265,42 @@ class ActionBookFlight(Action):
         
         # Get flight offers from slot
         flight_offers = tracker.get_slot("flight_offers")
-        
+        selected_flight_index = tracker.get_slot("selected_flight_index")
+        user_id = tracker.get_slot("user_id")
+
         if not flight_offers:
             dispatcher.utter_message(text="I don't have any flight offers to book. Let's search for flights first.")
             return []
+           # Get the selected flight (assuming the first one for simplicity)
+        # In a real implementation, you would get the user's selection
+        selected_flight = flight_offers[int(selected_flight_index)-1]
         
-        # In a real implementation, you would:
-        # 1. Get the selected flight from the user
-        # 2. Call the Amadeus flight booking API
-        # 3. Process payment
-        # 4. Confirm booking
+        # Get user information (assuming user ID 1 for simplicity)
+        # In a real implementation, you would identify the user from the conversation
+       # user_id = 1
         
-        # For this example, we'll just simulate a successful booking
-        dispatcher.utter_message(response="utter_flight_booked")
+        # Extract flight details for saving
+        flight_data = {
+            "bookingDate": datetime.now().strftime("%Y-%m-%d"),
+            "flightDetails": {
+                "price": selected_flight.get("price", {}),
+                "itineraries": selected_flight.get("itineraries", []),
+                "validatingAirlineCodes": selected_flight.get("validatingAirlineCodes", [])
+            },
+            "status": "confirmed"
+        }
         
+        print(flight_data)
+        # Add the flight to the user's record
+        success = add_flight_to_user(user_id, flight_data)
+        
+        if success:
+            # Confirm booking to the user
+            dispatcher.utter_message(response="utter_flight_booked")
+            #dispatcher.utter_message(text=f"Your booking reference is: #{flight_data['id']}")
+        else:
+            dispatcher.utter_message(text="I couldn't save your booking. Please try again later.")
+   
         # Clear flight offers slot after booking
         return [SlotSet("flight_offers", None)]
 
@@ -297,5 +320,12 @@ class ActionResetFlightBooking(Action):
             SlotSet("departureDate", None),
             SlotSet("returnDate", None),
             SlotSet("number_of_pax", "1"),
-            SlotSet("flight_offers", None)
+            SlotSet("flight_offers", None),
+            SlotSet("return_value", None),
+            SlotSet("flight_search_type", None),
+            SlotSet("travel_timeframe", None),
+            SlotSet("duration", None),
+            SlotSet("flight_suggestions", []),
+            SlotSet("destination_index", None),
+            SlotSet("selected_destination", None)
         ]

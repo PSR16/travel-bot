@@ -1,14 +1,63 @@
 version: "3.1"
 
+actions: 
+  - action_check_user_flights
+  
 slots:
   user_id:
     type: text
     initial_value: 1
     mappings:
       - type: from_llm
+  flights:
+    type: any
+    mappings:
+      - type: custom
+        action: get_user_flights
+
+  has_flights:
+    type: bool
+    mappings:
+      - type: custom
+        action: action_check_user_flights
+
+  flight_count:
+    type: float
+    mappings:
+      - type: custom
+        action: action_check_user_flights
+
+  next_flight_date:
+    type: text
+    mappings:
+      - type: custom
+        action: action_check_user_flights
+
+  next_flight_departure:
+    type: text
+    mappings:
+      - type: custom
+        action: action_check_user_flights
+
+  next_flight_arrival:
+    type: text
+    mappings:
+      - type: custom
+        action: action_check_user_flights
 
 responses:
   utter_good_day:
     - text: "Hello! How can I help you today?"
       metadata:
         rephrase: True
+
+  utter_welcome_back_with_flights:
+    - text: "Welcome back! I see you have an upcoming flight. Would you like to check its status?"
+      metadata:
+        rephrase: True
+  
+  utter_welcome_back_no_flights:
+    - text: "Welcome back! How can I help you today? Perhaps you'd like to book a flight?"
+      metadata:
+        rephrase: True
+ 

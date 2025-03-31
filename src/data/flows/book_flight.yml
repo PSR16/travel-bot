@@ -21,17 +21,16 @@ flows:
       
       #additional flight info
       - collect: "number_of_pax"
-        ask_before_filling: true
         description: "Number of passengers"
       - collect: "travel_class"
         description: "Travel class (Economy, Premium Economy, Business, First)"
-        ask_before_filling: true
+        #ask_before_filling: true
 
       ## Get and confirm travel budget
       - action: action_get_travel_budget
       - collect: "confirm_budget"
         description: "User confirmation that the budget is still accurate"
-        ask_before_filling: true
+        #ask_before_filling: true
         next:
           - if: slots.confirm_budget == "no"
             then: update_budget
@@ -40,7 +39,7 @@ flows:
       - id: update_budget
         collect: maxPrice
         description: "Updated travel budget"
-        ask_before_filling: true
+       # ask_before_filling: true
         next: proceed_to_confirmation
 
       - id: proceed_to_confirmation

@@ -65,6 +65,17 @@ slots:
     mappings:
       - type: from_llm
 
+  ## additional filters/prefs
+  preferred_departure_time:
+    type: text
+    mappings:
+      - type: from_llm
+  
+  preferred_return_time:
+    type: text
+    mappings:
+      - type: from_llm
+
 responses:
   utter_ask_departureDate:
     - text: "What day and time are you looking to travel?"
@@ -81,14 +92,12 @@ responses:
         rephrase: True
 
   utter_ask_confirm_budget:
-    - text: "I see your budget is {travel_budget}. Is this still accurate?"
+    - text: "According to YNAB, your travel budget is: {travel_budget}. Is this still accurate for this trip?"
       buttons:
         - title: "Yes"
           payload: /SetSlots(confirm_budget=yes)
-        - title: "No"
+        - title: "No, update my budget for this trip"
           payload: /SetSlots(confirm_budget=no)
-      metadata:
-        rephrase: True
 
   utter_ask_maxPrice:
     - text: "What is your budget for this trip?"
@@ -97,18 +106,30 @@ responses:
 
   utter_ask_number_of_pax:
     - text: "How many people are traveling?"
+  
   utter_ask_travel_class:
     - text: "What travel class would you prefer? (Economy, Premium Economy, Business, or First)"
+      buttons:
+        - title: "Economy"
+          payload: /SetSlots(travel_class=economy)
+        - title: "Premium Economy"
+          payload: /SetSlots(travel_class=premium_economy)
+        - title: "Business"
+          payload: /SetSlots(travel_class=business)
+        - title: "First"
+          payload: /SetSlots(travel_class=first)
 
   utter_searching_flights:
     - text: "Great, let me search for flights that match your criteria."
       metadata:
         rephrase: True
 
-  utter_ask_selected_flight:
-    - text: "Which flight option would you like to book? Please select a number."
   utter_flights_found:
     - text: "These are the flights I have found:"
+ 
+  utter_ask_selected_flight:
+    - text: "Which flight option would you like to book? Please select a number."
+
   utter_no_flights_found:
     - text: "I couldn't find any flights matching your criteria. Would you like to try different dates or destinations?"
   utter_travel_budget_confirm:

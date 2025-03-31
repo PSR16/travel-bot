@@ -61,7 +61,11 @@ slots:
       - type: from_llm
   
   selected_flight_index:
-    type: text
+    type: categorical
+    values:
+      - 1
+      - 2
+      - 3
     mappings:
       - type: from_llm
 
@@ -144,6 +148,14 @@ responses:
         Would you like to proceed with the search?"
   utter_ask_selected_flight_index:
     - text: "Which flight option would you like to book? Please select a number."
+      buttons:
+        - title: "1"
+          payload: /SetSlots(selected_flight_index=1)
+        - title: "2"
+          payload: /SetSlots(selected_flight_index=2)
+        - title: "3"
+          payload: /SetSlots(selected_flight_index=3)
+
   utter_flight_booked:
     - text: "Great! Your flight has been booked. You'll receive a confirmation email shortly with all the details."
   utter_booking_failed:

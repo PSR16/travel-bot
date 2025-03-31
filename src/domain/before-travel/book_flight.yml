@@ -5,10 +5,9 @@ actions:
   - action_confirm_flight_details
   - action_book_flight
   - action_reset_flight_booking
-  - validate_returnDate
-  - validate_departureDate
+  #- validate_returnDate
+  #- validate_departureDate
 
-  
 slots: 
   number_of_pax:
     type: text
@@ -40,6 +39,19 @@ slots:
     mappings:
       - type: from_llm
 
+  confirm_budget:
+    type: categorical
+    values:
+      - "yes"
+      - "no"
+    mappings:
+      - type: from_llm
+
+  maxPrice:
+    type: text
+    mappings:
+      - type: from_llm
+
   confirm_flight_details:
     type: categorical
     values:
@@ -56,18 +68,53 @@ slots:
 responses:
   utter_ask_departureDate:
     - text: "What day and time are you looking to travel?"
+      metadata:
+        rephrase: True
   utter_ask_returnDate:
     - text: "Are you booking a round-trip? If so, when would you like to return? (Say 'one-way' if you don't need a return flight)"
+      metadata:
+        rephrase: True
+
+  utter_invalid_returnDate:
+    - text: "Your return date is before your departure date. Please enter a valid return date."
+      metadata:
+        rephrase: True
+
+  utter_ask_confirm_budget:
+    - text: "I see your budget is {travel_budget}. Is this still accurate?"
+      buttons:
+        - title: "Yes"
+          payload: /SetSlots(confirm_budget=yes)
+        - title: "No"
+          payload: /SetSlots(confirm_budget=no)
+      metadata:
+        rephrase: True
+
+  utter_ask_maxPrice:
+    - text: "What is your budget for this trip?"
+      metadata:
+        rephrase: True
+
   utter_ask_number_of_pax:
     - text: "How many people are traveling?"
   utter_ask_travel_class:
     - text: "What travel class would you prefer? (Economy, Premium Economy, Business, or First)"
+
+  utter_searching_flights:
+    - text: "Great, let me search for flights that match your criteria."
+      metadata:
+        rephrase: True
+
   utter_ask_selected_flight:
     - text: "Which flight option would you like to book? Please select a number."
   utter_flights_found:
     - text: "These are the flights I have found:"
   utter_no_flights_found:
     - text: "I couldn't find any flights matching your criteria. Would you like to try different dates or destinations?"
+  utter_travel_budget_confirm:
+    - text: "It looks like your travel budget is ${travel_budget}. Is this correct?"
+      metadata:
+        rephrase: True
   utter_ask_confirm_flight_details:
     - text: "To confirm, you're looking to book a flight from {departure_city} to {destination} on {departureDate}.\n
         This is a {trip_type} flight.\n 

@@ -2,50 +2,50 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
-import datetime
+from datetime import datetime  
 from services.flight_service import FlightService
 
-class ValidateReturnDate(Action):
-    def name(self) -> Text:
-        return "validate_returnDate"
+# class ValidateReturnDate(Action):
+#     def name(self) -> Text:
+#         return "validate_returnDate"
 
-    def run(
-            self,
-            dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any],
-    ) -> List[Dict[Text, Any]]:
-        return_date = tracker.get_slot("returnDate")
-        departure_date = tracker.get_slot("departureDate")
+#     def run(
+#             self,
+#             dispatcher: CollectingDispatcher,
+#             tracker: Tracker,
+#             domain: Dict[Text, Any],
+#     ) -> List[Dict[Text, Any]]:
+#         return_date = tracker.get_slot("returnDate")
+#         departure_date = tracker.get_slot("departureDate")
         
-        if not return_date or not departure_date:
-            return []
+#         if not return_date or not departure_date:
+#             return []
             
-        try:
-            # Parse dates
-            dep_date = datetime.datetime.strptime(departure_date, "%Y-%m-%d").date()
+#         try:
+#             # Parse dates
+#             dep_date = datetime.datetime.strptime(departure_date, "%Y-%m-%d").date()
             
-            # Try to parse return date or add current year
-            try:
-                ret_date = datetime.datetime.strptime(return_date, "%Y-%m-%d").date()
-            except ValueError:
-                current_year = datetime.datetime.now().year
-                try:
-                    ret_date = datetime.datetime.strptime(f"{current_year}-{return_date}", "%Y-%m-%d").date()
-                except ValueError:
-                    dispatcher.utter_message(text="Please provide a valid return date.")
-                    return [SlotSet("returnDate", None)]
+#             # Try to parse return date or add current year
+#             try:
+#                 ret_date = datetime.datetime.strptime(return_date, "%Y-%m-%d").date()
+#             except ValueError:
+#                 current_year = datetime.datetime.now().year
+#                 try:
+#                     ret_date = datetime.datetime.strptime(f"{current_year}-{return_date}", "%Y-%m-%d").date()
+#                 except ValueError:
+#                     dispatcher.utter_message(text="Please provide a valid return date.")
+#                     return [SlotSet("returnDate", None)]
             
-            # Validate return date is after departure date
-            if ret_date <= dep_date:
-                dispatcher.utter_message(text="Return date must be after departure date.")
-                return [SlotSet("returnDate", None)]
+#             # Validate return date is after departure date
+#             if ret_date <= dep_date:
+#                 dispatcher.utter_message(text="Return date must be after departure date.")
+#                 return [SlotSet("returnDate", None)]
                 
-            return [SlotSet("returnDate", ret_date.strftime("%Y-%m-%d"))]
+#             return [SlotSet("returnDate", ret_date.strftime("%Y-%m-%d"))]
             
-        except Exception:
-            dispatcher.utter_message(text="Invalid date format.")
-            return [SlotSet("returnDate", None)]
+#         except Exception:
+#             dispatcher.utter_message(text="Invalid date format.")
+#             return [SlotSet("returnDate", None)]
 
 class ActionSearchFlights(Action):
     def name(self) -> Text:
@@ -55,12 +55,15 @@ class ActionSearchFlights(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
+        dispatcher.utter_message(response="utter_searching_flights")
         # Get slots
         departure_city = tracker.get_slot("departure_city")
         destination = tracker.get_slot("destination")
         departure_date = tracker.get_slot("departureDate")
         return_date = tracker.get_slot("returnDate")
         number_of_pax = tracker.get_slot("number_of_pax")
+        travel_class = tracker.get_slot("travel_class")
+        maxPrice = int(tracker.get_slot("maxPrice") or tracker.get_slot("travel_budget"))
         
         # Validate required slots
         if not departure_city or not destination or not departure_date:
@@ -85,7 +88,9 @@ class ActionSearchFlights(Action):
                 destination=destination,
                 departure_date=formatted_departure_date,
                 return_date=formatted_return_date,
-                num_adults=int(pax)
+                num_adults=int(pax),
+                travel_class=travel_class,
+                max_price=maxPrice
             )
             
             if flight_result and "data" in flight_result and flight_result["data"]:
@@ -109,9 +114,11 @@ class ActionSearchFlights(Action):
                     if outbound_segments:
                         first_segment = outbound_segments[0]
                         last_segment = outbound_segments[-1]
-                        departure_time = first_segment.get("departure", {}).get("at", "")
-                        arrival_time = last_segment.get("arrival", {}).get("at", "")
-                        outbound_info += f" ({departure_time} - {arrival_time})"
+                        departure_datetime = datetime.fromisoformat(first_segment.get("departure", {}).get("at", "").replace('Z', '+00:00'))
+                        arrival_datetime = datetime.fromisoformat(last_segment.get("arrival", {}).get("at", "").replace('Z', '+00:00'))
+                        formatted_departure = departure_datetime.strftime("%b %d, %I:%M %p")
+                        formatted_arrival = arrival_datetime.strftime("%b %d, %I:%M %p")
+                        outbound_info += f" ({formatted_departure} - {formatted_arrival})"
                     
                     # Format inbound flight if it exists
                     inbound_info = ""
@@ -121,9 +128,11 @@ class ActionSearchFlights(Action):
                         if inbound_segments:
                             first_segment = inbound_segments[0]
                             last_segment = inbound_segments[-1]
-                            departure_time = first_segment.get("departure", {}).get("at", "")
-                            arrival_time = last_segment.get("arrival", {}).get("at", "")
-                            inbound_info += f" ({departure_time} - {arrival_time})"
+                            departure_datetime = datetime.fromisoformat(first_segment.get("departure", {}).get("at", "").replace('Z', '+00:00'))
+                            arrival_datetime = datetime.fromisoformat(last_segment.get("arrival", {}).get("at", "").replace('Z', '+00:00'))
+                            formatted_departure = departure_datetime.strftime("%b %d, %I:%M %p")
+                            formatted_arrival = arrival_datetime.strftime("%b %d, %I:%M %p")
+                            inbound_info += f" ({formatted_departure} - {formatted_arrival})"
                     
                     # Display flight offer
                     flight_message = f"Option {i+1}: {price} {currency}\n{outbound_info}{inbound_info}"

@@ -3,23 +3,48 @@ flows:
     description: This flow books a flight given a departure and arrival city
     name: book a flight
     steps:
+      # Get departure city
       - action: action_get_departure_location
       - collect: "departure_city"
-        description: "city of departure"
+        description: "city of departure formatted appropriately"
       - collect: "destination"
-        description: "city of arrival"
+        description: "city of arrival formatted appropriately"
+
+      #collect dates
       - collect: "departureDate"
         description: "Date of departure in YYYY-MM-DD format of the current year, 2025"
       - collect: "returnDate"
         description: "Date of return in YYYY-MM-DD format of the current year, 2025"
+        rejections: 
+          - if: slots.returnDate < slots.departureDate
+            utter: utter_invalid_returnDate
+      
+      #additional flight info
       - collect: "number_of_pax"
         ask_before_filling: true
         description: "Number of passengers"
       - collect: "travel_class"
         description: "Travel class (Economy, Premium Economy, Business, First)"
         ask_before_filling: true
-      #- action: action_confirm_flight_details
-      - collect: confirm_flight_details
+
+      ## Get and confirm travel budget
+      - action: action_get_travel_budget
+      - collect: "confirm_budget"
+        description: "User confirmation that the budget is still accurate"
+        ask_before_filling: true
+        next:
+          - if: slots.confirm_budget == "no"
+            then: update_budget
+          - else: proceed_to_confirmation
+
+      - id: update_budget
+        collect: maxPrice
+        description: "Updated travel budget"
+        ask_before_filling: true
+        next: proceed_to_confirmation
+
+      - id: proceed_to_confirmation
+        collect: confirm_flight_details
         description: "User confirmation to proceed with flight search"
         ask_before_filling: true
         next:
@@ -37,6 +62,6 @@ flows:
         collect: "selected_flight_index"
         description: "Selected flight option number"
         ask_before_filling: true
-
       - action: action_book_flight
+
       - action: action_reset_flight_booking

@@ -1,6 +1,14 @@
 from typing import Dict, List, Optional, Any
 from .amadeus_service import AmadeusService
 
+TRAVEL_CLASS_MAP = {
+    "economy": "ECONOMY",
+    "premium_economy": "PREMIUM_ECONOMY",
+    "business": "BUSINESS",
+    "first": "FIRST"
+}
+
+
 class FlightService:
     def __init__(self):
         self.amadeus_service = AmadeusService()
@@ -42,8 +50,8 @@ class FlightService:
             params["oneWay"] = one_way
         if departure_date:
             params["departureDate"] = departure_date
-        if return_date:
-            params["returnDate"] = return_date
+        # if return_date:
+        #     params["returnDate"] = return_date
 
         # Determine which API to use based on whether destination is provided
         if destination:
@@ -92,7 +100,8 @@ class FlightService:
     def get_flight_offers(self, departure: str, destination: str, departure_date: str, 
                         num_adults: str, return_date: Optional[str] = None, 
                         num_children: Optional[str] = None, num_infants: Optional[str] = None, 
-                        travel_class: Optional[str] = None, one_way: Optional[bool] = None) -> Dict[str, Any]:
+                        travel_class: Optional[str] = None, one_way: Optional[bool] = None,
+                        max_price: Optional[str] = None) -> Dict[str, Any]:
         """Get flight offers based on given parameters"""
         result = {"success": False, "data": None, "message": None}
         
@@ -122,7 +131,7 @@ class FlightService:
             "currencyCode": "USD",
             "max": 5  # Limit to 5 results
         }
-        
+
         # Add optional parameters
         if return_date:
             params["returnDate"] = return_date
@@ -131,7 +140,9 @@ class FlightService:
         if num_infants:
             params["infants"] = num_infants
         if travel_class:
-            params["travelClass"] = travel_class
+            params["travelClass"] = TRAVEL_CLASS_MAP[travel_class]
+        if max_price:
+            params["maxPrice"] = max_price
         
         # Call Amadeus API to get flight offers
         response_data = self.amadeus_service.search_flight_offers(params)

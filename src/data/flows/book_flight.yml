@@ -1,126 +1,126 @@
-flows:
-  book_flight:
-    description: This flow books a flight given a departure and arrival city
-    name: book a flight
-    steps:
-      # Get departure city
-      - action: action_get_departure_location
-      - collect: departure_city
-        description: "city of departure formatted appropriately"
-      - collect: destination
-        description: "city of arrival formatted appropriately"
+# flows:
+#   book_flight:
+#     description: This flow books a flight given a departure and arrival city
+#     name: book a flight
+#     steps:
+#       # Get departure city
+#       - action: action_get_departure_location
+#       - collect: departure_city
+#         description: "city of departure formatted appropriately"
+#       - collect: destination
+#         description: "city of arrival formatted appropriately"
 
-      #collect dates
-      - id: collect_dates
-        collect: departureDate
-        description: "Date of departure in YYYY-MM-DD format of the current year, 2025"
+#       #collect dates
+#       - id: collect_dates
+#         collect: departureDate
+#         description: "Date of departure in YYYY-MM-DD format of the current year, 2025"
 
-      - collect: returnDate
-        description: "Date of return in YYYY-MM-DD format of the current year, 2025"
-        rejections: 
-          - if: slots.returnDate < slots.departureDate
-            utter: utter_invalid_returnDate
+#       - collect: returnDate
+#         description: "Date of return in YYYY-MM-DD format of the current year, 2025"
+#         rejections: 
+#           - if: slots.returnDate < slots.departureDate
+#             utter: utter_invalid_returnDate
       
-      #additional flight info
-      - id: collect_flight_info
-        collect: "number_of_pax"
-        description: "Number of passengers"
-      - collect: "travel_class"
-        description: "Travel class (Economy, Premium Economy, Business, First)"
-        #ask_before_filling: true
+#       #additional flight info
+#       - id: collect_flight_info
+#         collect: "number_of_pax"
+#         description: "Number of passengers"
+#       - collect: "travel_class"
+#         description: "Travel class (Economy, Premium Economy, Business, First)"
+#         #ask_before_filling: true
 
-      ## Get and confirm travel budget
-      - id: get_budget
-        action: action_get_travel_budget
-      - collect: "confirm_budget"
-        description: "User confirmation that the budget is still accurate"
-        #ask_before_filling: true
-        next:
-          - if: slots.confirm_budget == "no"
-            then: update_budget
-          - else: proceed_to_confirmation
+#       ## Get and confirm travel budget
+#       - id: get_budget
+#         action: action_get_travel_budget
+#       - collect: "confirm_budget"
+#         description: "User confirmation that the budget is still accurate"
+#         #ask_before_filling: true
+#         next:
+#           - if: slots.confirm_budget == "no"
+#             then: update_budget
+#           - else: proceed_to_confirmation
 
-      - id: update_budget
-        collect: maxPrice
-        description: "Updated travel budget"
-       # ask_before_filling: true
-        next: proceed_to_confirmation
+#       - id: update_budget
+#         collect: maxPrice
+#         description: "Updated travel budget"
+#        # ask_before_filling: true
+#         next: proceed_to_confirmation
 
-      - id: proceed_to_confirmation
-        collect: confirm_flight_details
-        description: "User confirmation to proceed with flight search"
-        ask_before_filling: true
-        next:
-          - if: slots.confirm_flight_details == "yes"
-            then: search_flights
-          - else: END
+#       - id: proceed_to_confirmation
+#         collect: confirm_flight_details
+#         description: "User confirmation to proceed with flight search"
+#         ask_before_filling: true
+#         next:
+#           - if: slots.confirm_flight_details == "yes"
+#             then: search_flights
+#           - else: END
 
-      #Search flight offers
-      - id: search_flights
-        action: action_search_flights
-        next: 
-          - if: slots.return_value == "success"
-            then: select_flight
-          - if: slots.return_value == "no_flights_found"
-            then: 
-              - action: utter_no_flights_found
-                next: ask_modify_search
-          - else: END
+#       #Search flight offers
+#       - id: search_flights
+#         action: action_search_flights
+#         next: 
+#           - if: slots.return_value == "success"
+#             then: select_flight
+#           - if: slots.return_value == "no_flights_found"
+#             then: 
+#               - action: utter_no_flights_found
+#                 next: ask_modify_search
+#           - else: END
 
-      # Ask if user wants to modify search parameters
-      - id: ask_modify_search
-        collect: "modify_search"
-        description: "User's choice to modify search parameters"
-        ask_before_filling: true
-        next:
-          - if: slots.modify_search == "yes"
-            then: choose_parameter_to_modify
-          - else: END
+#       # Ask if user wants to modify search parameters
+#       - id: ask_modify_search
+#         collect: "modify_search"
+#         description: "User's choice to modify search parameters"
+#         ask_before_filling: true
+#         next:
+#           - if: slots.modify_search == "yes"
+#             then: choose_parameter_to_modify
+#           - else: END
       
-      # Let user choose which parameter to modify
-      - id: choose_parameter_to_modify
-        collect: "parameter_to_modify"
-        description: "Search parameter the user wants to change"
-        ask_before_filling: true
-        next:
-          - if: slots.parameter_to_modify == "dates"
-            then: collect_dates
-          - if: slots.parameter_to_modify == "destination"
-            then: collect_new_destination
-          - if: slots.parameter_to_modify == "budget"
-            then: update_budget
-          - if: slots.parameter_to_modify == "class"
-            then: collect_new_class
-          - else: proceed_to_confirmation
+#       # Let user choose which parameter to modify
+#       - id: choose_parameter_to_modify
+#         collect: "parameter_to_modify"
+#         description: "Search parameter the user wants to change"
+#         ask_before_filling: true
+#         next:
+#           - if: slots.parameter_to_modify == "dates"
+#             then: collect_dates
+#           - if: slots.parameter_to_modify == "destination"
+#             then: collect_new_destination
+#           - if: slots.parameter_to_modify == "budget"
+#             then: update_budget
+#           - if: slots.parameter_to_modify == "class"
+#             then: collect_new_class
+#           - else: proceed_to_confirmation
             
-      # Collect new destination
-      - id: collect_new_destination
-        collect: "destination"
-        description: "Updated city of arrival formatted appropriately"
-        next: proceed_to_confirmation
+#       # Collect new destination
+#       - id: collect_new_destination
+#         collect: "destination"
+#         description: "Updated city of arrival formatted appropriately"
+#         next: proceed_to_confirmation
         
-      # Collect new travel class
-      - id: collect_new_class
-        collect: "travel_class"
-        description: "Updated travel class (Economy, Premium Economy, Business, First)"
-        next: proceed_to_confirmation
+#       # Collect new travel class
+#       - id: collect_new_class
+#         collect: "travel_class"
+#         description: "Updated travel class (Economy, Premium Economy, Business, First)"
+#         next: proceed_to_confirmation
 
-      # Select a flight
-      - id: select_flight
-        collect: "selected_flight_index"
-        description: "Selected flight option number"
-        ask_before_filling: true
-        next: 
-          - if: slots.selected_flight_index == "modify"
-            then: ask_modify_search
-          - else: book_flight_step
+#       # Select a flight
+#       - id: select_flight
+#         collect: "selected_flight_index"
+#         description: "Selected flight option number"
+#         ask_before_filling: true
+#         next: 
+#           - if: slots.selected_flight_index == "modify"
+#             then: ask_modify_search
+#           - else: book_flight_step
         
-      # Book the flight
-      - id: book_flight_step
-        action: action_book_flight
-        next: reset_booking
+#       # Book the flight
+#       - id: book_flight_step
+#         action: action_book_flight
+#         next: reset_booking
         
-      #Reset booking slots
-      - id: reset_booking
-        action: action_reset_flight_booking
-        next: END
+#       #Reset booking slots
+#       - id: reset_booking
+#         action: action_reset_flight_booking
+#         next: END

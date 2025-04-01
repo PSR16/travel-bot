@@ -246,7 +246,7 @@ class ActionSelectDestination(Action):
             destination_index = int(destination_index)
         
         if destination_index is None or not isinstance(destination_index, int):
-            dispatcher.utter_message(text="Please select a destination from the options provided.")
+            #dispatcher.utter_message(text="Please select a destination from the options provided.")
             return []
         
         # Validate index

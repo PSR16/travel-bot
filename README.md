@@ -1,5 +1,7 @@
-# travel-bot
 
-Train assistant: `rasa train`
-
-Start: `rasa inspect`
+```
+source ./venv/bin/activate
+cd src
+rasa train
+rasa inspect
+```

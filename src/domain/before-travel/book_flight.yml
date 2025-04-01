@@ -1,203 +1,203 @@
-version: "3.1"
+# version: "3.1"
 
-actions:
-  - action_search_flights
-  - action_confirm_flight_details
-  - action_book_flight
-  - action_reset_flight_booking
+# actions:
+#   - action_search_flights
+#   - action_confirm_flight_details
+#   - action_book_flight
+#   - action_reset_flight_booking
 
-slots: 
-  number_of_pax:
-    type: text
-    initial_value: 1
-    mappings:
-      - type: from_llm
+# slots: 
+#   number_of_pax:
+#     type: text
+#     initial_value: 1
+#     mappings:
+#       - type: from_llm
 
-  flight_offers:
-    type: list
-    mappings:
-      - type: custom
+#   flight_offers:
+#     type: list
+#     mappings:
+#       - type: custom
   
-  travel_class:
-    type: categorical
-    values:
-      - economy
-      - premium_economy
-      - business
-      - first
-    mappings:
-      - type: from_llm
+#   travel_class:
+#     type: categorical
+#     values:
+#       - economy
+#       - premium_economy
+#       - business
+#       - first
+#     mappings:
+#       - type: from_llm
   
-  trip_type:
-    type: categorical
-    initial_value: round-trip
-    values:
-      - one-way
-      - round-trip
-    mappings:
-      - type: from_llm
+#   trip_type:
+#     type: categorical
+#     initial_value: round-trip
+#     values:
+#       - one-way
+#       - round-trip
+#     mappings:
+#       - type: from_llm
 
-  confirm_budget:
-    type: categorical
-    values:
-      - "yes"
-      - "no"
-    mappings:
-      - type: from_llm
+#   confirm_budget:
+#     type: categorical
+#     values:
+#       - "yes"
+#       - "no"
+#     mappings:
+#       - type: from_llm
 
-  maxPrice:
-    type: text
-    mappings:
-      - type: from_llm
+#   maxPrice:
+#     type: text
+#     mappings:
+#       - type: from_llm
 
-  confirm_flight_details:
-    type: categorical
-    values:
-      - yes
-      - no
-    mappings:
-      - type: from_llm
+#   confirm_flight_details:
+#     type: categorical
+#     values:
+#       - yes
+#       - no
+#     mappings:
+#       - type: from_llm
   
-  selected_flight_index:
-    type: categorical
-    values:
-      - 1
-      - 2
-      - 3
-      - modify
-    mappings:
-      - type: from_llm
+#   selected_flight_index:
+#     type: categorical
+#     values:
+#       - 1
+#       - 2
+#       - 3
+#       - modify
+#     mappings:
+#       - type: from_llm
 
-  #modify
-  modify_search:
-    type: categorical
-    values:
-      - "yes"
-      - "no"
-    mappings:
-      - type: from_llm
+#   #modify
+#   modify_search:
+#     type: categorical
+#     values:
+#       - "yes"
+#       - "no"
+#     mappings:
+#       - type: from_llm
   
-  parameter_to_modify:
-    type: categorical
-    values:
-      - dates
-      - destination
-      - budget
-      - class
-    mappings:
-      - type: from_llm
+#   parameter_to_modify:
+#     type: categorical
+#     values:
+#       - dates
+#       - destination
+#       - budget
+#       - class
+#     mappings:
+#       - type: from_llm
 
-  ## additional filters/prefs
-  preferred_departure_time:
-    type: text
-    mappings:
-      - type: from_llm
+#   ## additional filters/prefs
+#   preferred_departure_time:
+#     type: text
+#     mappings:
+#       - type: from_llm
   
-  preferred_return_time:
-    type: text
-    mappings:
-      - type: from_llm
+#   preferred_return_time:
+#     type: text
+#     mappings:
+#       - type: from_llm
 
-responses:
-  utter_ask_departureDate:
-    - text: "What day and time are you looking to travel?"
-      metadata:
-        rephrase: True
-  utter_ask_returnDate:
-    - text: "Are you booking a round-trip? If so, when would you like to return? (Say 'one-way' if you don't need a return flight)"
-      metadata:
-        rephrase: True
+# responses:
+#   utter_ask_departureDate:
+#     - text: "What day and time are you looking to travel?"
+#       metadata:
+#         rephrase: True
+#   utter_ask_returnDate:
+#     - text: "Are you booking a round-trip? If so, when would you like to return? (Say 'one-way' if you don't need a return flight)"
+#       metadata:
+#         rephrase: True
 
-  utter_invalid_returnDate:
-    - text: "Your return date is before your departure date. Please enter a valid return date."
-      metadata:
-        rephrase: True
+#   utter_invalid_returnDate:
+#     - text: "Your return date is before your departure date. Please enter a valid return date."
+#       metadata:
+#         rephrase: True
 
-  utter_ask_confirm_budget:
-    - text: "According to YNAB, your travel budget is: {travel_budget}. Is this still accurate for this trip?"
-      buttons:
-        - title: "Yes"
-          payload: /SetSlots(confirm_budget=yes)
-        - title: "No, update my budget for this trip"
-          payload: /SetSlots(confirm_budget=no)
+#   utter_ask_confirm_budget:
+#     - text: "According to YNAB, your travel budget is: {travel_budget}. Is this still accurate for this trip?"
+#       buttons:
+#         - title: "Yes"
+#           payload: /SetSlots(confirm_budget=yes)
+#         - title: "No, update my budget for this trip"
+#           payload: /SetSlots(confirm_budget=no)
 
-  utter_ask_maxPrice:
-    - text: "What is your budget for this trip?"
-      metadata:
-        rephrase: True
+#   utter_ask_maxPrice:
+#     - text: "What is your budget for this trip?"
+#       metadata:
+#         rephrase: True
 
-  utter_ask_number_of_pax:
-    - text: "How many people are traveling?"
+#   utter_ask_number_of_pax:
+#     - text: "How many people are traveling?"
   
-  utter_ask_travel_class:
-    - text: "What travel class would you prefer? (Economy, Premium Economy, Business, or First)"
-      buttons:
-        - title: "Economy"
-          payload: /SetSlots(travel_class=economy)
-        - title: "Premium Economy"
-          payload: /SetSlots(travel_class=premium_economy)
-        - title: "Business"
-          payload: /SetSlots(travel_class=business)
-        - title: "First"
-          payload: /SetSlots(travel_class=first)
+#   utter_ask_travel_class:
+#     - text: "What travel class would you prefer? (Economy, Premium Economy, Business, or First)"
+#       buttons:
+#         - title: "Economy"
+#           payload: /SetSlots(travel_class=economy)
+#         - title: "Premium Economy"
+#           payload: /SetSlots(travel_class=premium_economy)
+#         - title: "Business"
+#           payload: /SetSlots(travel_class=business)
+#         - title: "First"
+#           payload: /SetSlots(travel_class=first)
 
-  utter_searching_flights:
-    - text: "Great, let me search for flights that match your criteria."
-      metadata:
-        rephrase: True
+#   utter_searching_flights:
+#     - text: "Great, let me search for flights that match your criteria."
+#       metadata:
+#         rephrase: True
 
-  utter_flights_found:
-    - text: "These are the flights I have found:"
+#   utter_flights_found:
+#     - text: "These are the flights I have found:"
     
-  utter_travel_budget_confirm:
-    - text: "It looks like your travel budget is ${travel_budget}. Is this correct?"
-      metadata:
-        rephrase: True
-  utter_ask_confirm_flight_details:
-    - text: "To confirm, you're looking to book a flight from {departure_city} to {destination} on {departureDate}.\n
-        This is a {trip_type} flight.\n 
-        Number of passengers: {number_of_pax}.\n
-        Travel class: {travel_class}.\n\n
-        Would you like to proceed with the search?"
-  utter_ask_selected_flight_index:
-    - text: "Which flight option would you like to book? Please select a number."
-      buttons:
-        - title: "1"
-          payload: /SetSlots(selected_flight_index=1)
-        - title: "2"
-          payload: /SetSlots(selected_flight_index=2)
-        - title: "3"
-          payload: /SetSlots(selected_flight_index=3)
-        - title: "Modify my search"
-          payload: /SetSlots(selected_flight_index=modify)
+#   utter_travel_budget_confirm:
+#     - text: "It looks like your travel budget is ${travel_budget}. Is this correct?"
+#       metadata:
+#         rephrase: True
+#   utter_ask_confirm_flight_details:
+#     - text: "To confirm, you're looking to book a flight from {departure_city} to {destination} on {departureDate}.\n
+#         This is a {trip_type} flight.\n 
+#         Number of passengers: {number_of_pax}.\n
+#         Travel class: {travel_class}.\n\n
+#         Would you like to proceed with the search?"
+#   utter_ask_selected_flight_index:
+#     - text: "Which flight option would you like to book? Please select a number."
+#       buttons:
+#         - title: "1"
+#           payload: /SetSlots(selected_flight_index=1)
+#         - title: "2"
+#           payload: /SetSlots(selected_flight_index=2)
+#         - title: "3"
+#           payload: /SetSlots(selected_flight_index=3)
+#         - title: "Modify my search"
+#           payload: /SetSlots(selected_flight_index=modify)
 
-  utter_flight_booked:
-    - text: "Great! Your flight has been booked. You'll receive a confirmation email shortly with all the details."
+#   utter_flight_booked:
+#     - text: "Great! Your flight has been booked. You'll receive a confirmation email shortly with all the details."
   
-  utter_booking_failed:
-    - text: "I'm sorry, but there was an issue with your booking. Please try again later or contact customer support."
+#   utter_booking_failed:
+#     - text: "I'm sorry, but there was an issue with your booking. Please try again later or contact customer support."
   
-  utter_ask_modify_search:
-    - text: "Would you like to modify your search parameters to find available flights?"
-      buttons:
-        - title: "Yes"
-          payload: /SetSlots(modify_search=yes)
-        - title: "No"
-          payload: /SetSlots(modify_search=no)
+#   utter_ask_modify_search:
+#     - text: "Would you like to modify your search parameters to find available flights?"
+#       buttons:
+#         - title: "Yes"
+#           payload: /SetSlots(modify_search=yes)
+#         - title: "No"
+#           payload: /SetSlots(modify_search=no)
         
-  utter_ask_parameter_to_modify:
-    - text: "What would you like to change?"
-      buttons:
-        - title: "Travel dates"
-          payload: /SetSlots(parameter_to_modify=dates)
-        - title: "Destination"
-          payload: /SetSlots(parameter_to_modify=destination)
-        - title: "Budget"
-          payload: /SetSlots(parameter_to_modify=budget)
-        - title: "Travel class"
-          payload: /SetSlots(parameter_to_modify=class)
+#   utter_ask_parameter_to_modify:
+#     - text: "What would you like to change?"
+#       buttons:
+#         - title: "Travel dates"
+#           payload: /SetSlots(parameter_to_modify=dates)
+#         - title: "Destination"
+#           payload: /SetSlots(parameter_to_modify=destination)
+#         - title: "Budget"
+#           payload: /SetSlots(parameter_to_modify=budget)
+#         - title: "Travel class"
+#           payload: /SetSlots(parameter_to_modify=class)
           
-  utter_no_flights_found:
-    - text: "I couldn't find any flights matching your criteria. Would you like to try different dates, destinations, or other search parameters?"
-      metadata:
-        rephrase: True
+#   utter_no_flights_found:
+#     - text: "I couldn't find any flights matching your criteria. Would you like to try different dates, destinations, or other search parameters?"
+#       metadata:
+#         rephrase: True

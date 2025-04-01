@@ -126,22 +126,80 @@ def add_flight_to_user(user_id: int, flight_data: Dict[str, Any]) -> bool:
     if not user:
         return False
     
-    user_dict = user.to_dict()
+     user_dict = user.to_dict()
     
     # Initialize flights array if it doesn't exist
     if "flights" not in user_dict:
         user_dict["flights"] = []
     
+    # Extract and simplify the important flight information
+    simplified_flight = {
+        "id": flight_data.get("id"),
+        "bookingDate": flight_data.get("bookingDate"),
+        "status": flight_data.get("status", "confirmed"),
+        "totalPrice": {
+            "amount": flight_data.get("flightDetails", {}).get("price", {}).get("total"),
+            "currency": flight_data.get("flightDetails", {}).get("price", {}).get("currency", "USD")
+        },
+        "outboundFlight": _extract_flight_segment(flight_data, 0, 0),  # First segment of outbound journey
+        "returnFlight": None,  # Will be populated if it's a round trip
+        "airline": flight_data.get("flightDetails", {}).get("validatingAirlineCodes", [""])[0],
+        "tripType": "ONE_WAY"
+    }
+    
+    # Check if it's a round trip (has more than one itinerary)
+    itineraries = flight_data.get("flightDetails", {}).get("itineraries", [])
+    if len(itineraries) > 1:
+        simplified_flight["returnFlight"] = _extract_flight_segment(flight_data, 1, 0)  # First segment of return journey
+        simplified_flight["tripType"] = "ROUND_TRIP"
+    
     # Generate flight ID if not provided
-    if "id" not in flight_data:
+    if simplified_flight["id"] is None:
         max_id = 0
         for flight in user_dict["flights"]:
             if flight.get("id", 0) > max_id:
                 max_id = flight.get("id")
-        flight_data["id"] = max_id + 1
+        simplified_flight["id"] = max_id + 1
     
-    # Add the flight to the user's flights
-    user_dict["flights"].append(flight_data)
+    # Add the simplified flight to the user's flights
+    user_dict["flights"].append(simplified_flight)
     
     # Update the user in the database
     return update_user(user_id, user_dict)
+
+def _extract_flight_segment(flight_data: Dict[str, Any], itinerary_index: int, segment_index: int) -> Dict[str, Any]:
+    """Extract the important information from a flight segment.
+    
+    Args:
+        flight_data: The complete flight data
+        itinerary_index: Index of the itinerary (0 for outbound, 1 for return)
+        segment_index: Index of the segment within the itinerary
+        
+    Returns:
+        Dict containing simplified flight segment information
+    """
+    try:
+        itineraries = flight_data.get("flightDetails", {}).get("itineraries", [])
+        if itinerary_index >= len(itineraries):
+            return None
+            
+        segments = itineraries[itinerary_index].get("segments", [])
+        if segment_index >= len(segments):
+            return None
+            
+        segment = segments[segment_index]
+        
+        return {
+            "departureAirport": segment.get("departure", {}).get("iataCode"),
+            "departureTerminal": segment.get("departure", {}).get("terminal"),
+            "departureTime": segment.get("departure", {}).get("at"),
+            "arrivalAirport": segment.get("arrival", {}).get("iataCode"),
+            "arrivalTerminal": segment.get("arrival", {}).get("terminal"),
+            "arrivalTime": segment.get("arrival", {}).get("at"),
+            "flightNumber": f"{segment.get('carrierCode')}{segment.get('number')}",
+            "duration": segment.get("duration"),
+            "stops": segment.get("numberOfStops", 0)
+        }
+    except Exception as e:
+        print(f"Error extracting flight segment: {e}")
+        return {}

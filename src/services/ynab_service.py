@@ -27,6 +27,7 @@ class YNABService:
             
         try:
             url = f"{self.base_url}/budgets/{self.budget_id}/categories/{self.travel_category}"
+            print(url)
             response = requests.get(url, headers=self.get_headers())
             response.raise_for_status()
             
@@ -34,11 +35,9 @@ class YNABService:
             travel_category = data['data']['category']
             
             # YNAB amounts are in milliunits
-            budgeted = travel_category['budgeted'] / 1000
-            balance = travel_category['balance'] / 1000
-            activity = travel_category['activity'] / 1000
+            budgeted = travel_category['balance'] / 1000
             
-            return budgeted, activity, balance
+            return budgeted
             
         except (requests.exceptions.RequestException, KeyError, ValueError):
             return None

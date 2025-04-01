@@ -6,48 +6,6 @@ from datetime import datetime
 from services.flight_service import FlightService
 from actions.db import add_flight_to_user
 
-# class ValidateReturnDate(Action):
-#     def name(self) -> Text:
-#         return "validate_returnDate"
-
-#     def run(
-#             self,
-#             dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any],
-#     ) -> List[Dict[Text, Any]]:
-#         return_date = tracker.get_slot("returnDate")
-#         departure_date = tracker.get_slot("departureDate")
-        
-#         if not return_date or not departure_date:
-#             return []
-            
-#         try:
-#             # Parse dates
-#             dep_date = datetime.datetime.strptime(departure_date, "%Y-%m-%d").date()
-            
-#             # Try to parse return date or add current year
-#             try:
-#                 ret_date = datetime.datetime.strptime(return_date, "%Y-%m-%d").date()
-#             except ValueError:
-#                 current_year = datetime.datetime.now().year
-#                 try:
-#                     ret_date = datetime.datetime.strptime(f"{current_year}-{return_date}", "%Y-%m-%d").date()
-#                 except ValueError:
-#                     dispatcher.utter_message(text="Please provide a valid return date.")
-#                     return [SlotSet("returnDate", None)]
-            
-#             # Validate return date is after departure date
-#             if ret_date <= dep_date:
-#                 dispatcher.utter_message(text="Return date must be after departure date.")
-#                 return [SlotSet("returnDate", None)]
-                
-#             return [SlotSet("returnDate", ret_date.strftime("%Y-%m-%d"))]
-            
-#         except Exception:
-#             dispatcher.utter_message(text="Invalid date format.")
-#             return [SlotSet("returnDate", None)]
-
 class ActionSearchFlights(Action):
     def name(self) -> Text:
         return "action_search_flights"
@@ -179,6 +137,16 @@ class ActionSearchFlights(Action):
         travel_class = tracker.get_slot("travel_class")
         maxPrice = int(tracker.get_slot("maxPrice") or tracker.get_slot("travel_budget"))
         
+        if not departure_date or not return_date:
+            travel_timeframe = tracker.get_slot("travel_timeframe")
+            if travel_timeframe:
+                # Parse travel_timeframe and extract dates
+                # This is a simplified example - you'd need proper date parsing logic
+                dates = travel_timeframe.split(",")
+                if len(dates) >= 1:
+                    departure_date = departure_date or dates[0]
+                if len(dates) >= 2:
+                    return_date = return_date or dates[1]
         # Validate required slots
         if not departure_city or not destination or not departure_date:
             dispatcher.utter_message(text="I need your departure city, destination, and departure date to search for flights.")

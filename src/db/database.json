@@ -1,17 +1,103 @@
 {
-    "users": [
+  "users": [
+    {
+      "id": 1,
+      "name": {
+        "firstName": "Alba",
+        "lastName": "Tross"
+      },
+      "preferredDepartureCity": "New York",
+      "preferredDepartureState": "New York",
+      "preferredDepartureCountry": "USA",
+      "preferredCurrency": "USD",
+      "preferredSeat": "Window",
+      "preferredMeal": "Vegetarian",
+      "flights": [
         {
-            "id": 1,
-            "name": {
-                "firstName": "Alba",
-                "lastName": "Tross"
+          "bookingDate": "2025-03-31",
+          "flightDetails": {
+            "price": {
+              "currency": "USD",
+              "total": "206.96",
+              "base": "164.06",
+              "fees": [
+                {
+                  "amount": "0.00",
+                  "type": "SUPPLIER"
+                },
+                {
+                  "amount": "0.00",
+                  "type": "TICKETING"
+                }
+              ],
+              "grandTotal": "206.96"
             },
-            "preferredDepartureCity": "Seattle",
-            "preferredDepartureState": "Washington",
-            "preferredDepartureCountry": "USA",
-            "preferredCurrency": "USD",
-            "preferredSeat": "Window",
-            "preferredMeal": "Vegetarian"
+            "itineraries": [
+              {
+                "duration": "PT3H11M",
+                "segments": [
+                  {
+                    "departure": {
+                      "iataCode": "EWR",
+                      "terminal": "C",
+                      "at": "2025-06-04T11:11:00"
+                    },
+                    "arrival": {
+                      "iataCode": "MIA",
+                      "at": "2025-06-04T14:22:00"
+                    },
+                    "carrierCode": "UA",
+                    "number": "2295",
+                    "aircraft": {
+                      "code": "739"
+                    },
+                    "operating": {
+                      "carrierCode": "UA"
+                    },
+                    "duration": "PT3H11M",
+                    "id": "1",
+                    "numberOfStops": 0,
+                    "blacklistedInEU": false
+                  }
+                ]
+              },
+              {
+                "duration": "PT3H5M",
+                "segments": [
+                  {
+                    "departure": {
+                      "iataCode": "MIA",
+                      "at": "2025-06-11T06:00:00"
+                    },
+                    "arrival": {
+                      "iataCode": "EWR",
+                      "terminal": "C",
+                      "at": "2025-06-11T09:05:00"
+                    },
+                    "carrierCode": "UA",
+                    "number": "1826",
+                    "aircraft": {
+                      "code": "739"
+                    },
+                    "operating": {
+                      "carrierCode": "UA"
+                    },
+                    "duration": "PT3H5M",
+                    "id": "4",
+                    "numberOfStops": 0,
+                    "blacklistedInEU": false
+                  }
+                ]
+              }
+            ],
+            "validatingAirlineCodes": [
+              "UA"
+            ]
+          },
+          "status": "confirmed",
+          "id": 1
         }
-    ]
+      ]
+    }
+  ]
 }
